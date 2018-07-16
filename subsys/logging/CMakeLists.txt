@@ -42,3 +42,8 @@ zephyr_sources_ifdef(
   CONFIG_LOG_BACKEND_SWO
   log_backend_swo.c
 )
+
+zephyr_sources_ifdef(
+  CONFIG_LOG_FRONTEND
+  log_frontend.c
+  )

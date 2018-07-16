@@ -35,6 +35,13 @@ LOG_MODULE_REGISTER(log);
 
 #ifndef CONFIG_LOG_STRDUP_MAX_STRING
 #define CONFIG_LOG_STRDUP_MAX_STRING 0
+#ifdef CONFIG_LOG_FRONTEND
+#include <logging/log_frontend.h>
+#endif
+
+#ifdef CONFIG_LOG_BACKEND_UART
+#include <logging/log_backend_uart.h>
+LOG_BACKEND_UART_DEFINE(log_backend_uart);
 #endif
 
 #ifndef CONFIG_LOG_STRDUP_BUF_COUNT
@@ -209,24 +216,32 @@ static inline void msg_finalize(struct log_msg *msg,
 
 void log_0(const char *str, struct log_msg_ids src_level)
 {
-	struct log_msg *msg = log_msg_create_0(str);
+	if(IS_ENABLED(CONFIG_LOG_FRONTEND)) {
+		log_frontend_nrf_0(str, src_level);
+	} else {
+		struct log_msg *msg = log_msg_create_0(str);
 
-	if (msg == NULL) {
-		return;
+		if (msg == NULL) {
+			return;
+		}
+		msg_finalize(msg, src_level);
 	}
-	msg_finalize(msg, src_level);
 }
 
 void log_1(const char *str,
 	   u32_t arg0,
 	   struct log_msg_ids src_level)
 {
-	struct log_msg *msg = log_msg_create_1(str, arg0);
+	if(IS_ENABLED(CONFIG_LOG_FRONTEND)) {
+		log_frontend_nrf_1(str, arg0, src_level);
+	} else {
+		struct log_msg *msg = log_msg_create_1(str, arg0);
 
-	if (msg == NULL) {
-		return;
+		if (msg == NULL) {
+			return;
+		}
+		msg_finalize(msg, src_level);
 	}
-	msg_finalize(msg, src_level);
 }
 
 void log_2(const char *str,
@@ -234,13 +249,17 @@ void log_2(const char *str,
 	   u32_t arg1,
 	   struct log_msg_ids src_level)
 {
-	struct log_msg *msg = log_msg_create_2(str, arg0, arg1);
+	if(IS_ENABLED(CONFIG_LOG_FRONTEND)) {
+		log_frontend_nrf_2(str, arg0, arg1, src_level);
+	} else {
+		struct log_msg *msg = log_msg_create_2(str, arg0, arg1);
 
-	if (msg == NULL) {
-		return;
+		if (msg == NULL) {
+			return;
+		}
+
+		msg_finalize(msg, src_level);
 	}
-
-	msg_finalize(msg, src_level);
 }
 
 void log_3(const char *str,
@@ -249,13 +268,17 @@ void log_3(const char *str,
 	   u32_t arg2,
 	   struct log_msg_ids src_level)
 {
-	struct log_msg *msg = log_msg_create_3(str, arg0, arg1, arg2);
+	if(IS_ENABLED(CONFIG_LOG_FRONTEND)) {
+		log_frontend_nrf_3(str, arg0, arg1, arg2, src_level);
+	} else {
+		struct log_msg *msg = log_msg_create_3(str, arg0, arg1, arg2);
 
-	if (msg == NULL) {
-		return;
+		if (msg == NULL) {
+			return;
+		}
+
+		msg_finalize(msg, src_level);
 	}
-
-	msg_finalize(msg, src_level);
 }
 
 void log_n(const char *str,
@@ -263,13 +286,17 @@ void log_n(const char *str,
 	   u32_t narg,
 	   struct log_msg_ids src_level)
 {
-	struct log_msg *msg = log_msg_create_n(str, args, narg);
+	if(IS_ENABLED(CONFIG_LOG_FRONTEND)) {
+		log_frontend_nrf_n(str, args, narg, src_level);
+	} else {
+		struct log_msg *msg = log_msg_create_n(str, args, narg);
 
-	if (msg == NULL) {
-		return;
+		if (msg == NULL) {
+			return;
+		}
+
+		msg_finalize(msg, src_level);
 	}
-
-	msg_finalize(msg, src_level);
 }
 
 void log_hexdump(const char *str,
@@ -277,13 +304,21 @@ void log_hexdump(const char *str,
 		 u32_t length,
 		 struct log_msg_ids src_level)
 {
+<<<<<<< HEAD
 	struct log_msg *msg = log_msg_hexdump_create(str, data, length);
+=======
+	if(IS_ENABLED(CONFIG_LOG_FRONTEND)) {
+		log_frontend_nrf_hexdump(data, length, src_level);
+	} else {
+		struct log_msg *msg = log_msg_hexdump_create(data, length);
+>>>>>>> c159cac... GPIO frontend added to logger
 
-	if (msg == NULL) {
-		return;
+		if (msg == NULL) {
+			return;
+		}
+
+		msg_finalize(msg, src_level);
 	}
-
-	msg_finalize(msg, src_level);
 }
 
 int log_printk(const char *fmt, va_list ap)
@@ -451,6 +486,7 @@ void log_init(void)
 		return;
 	}
 
+<<<<<<< HEAD
 	/* Assign ids to backends. */
 	for (i = 0; i < log_backend_count_get(); i++) {
 		const struct log_backend *backend = log_backend_get(i);
@@ -487,6 +523,19 @@ void log_thread_set(k_tid_t process_tid)
 	} else {
 		thread_set(process_tid);
 	}
+=======
+#ifdef CONFIG_LOG_FRONTEND
+	log_frontend_init();
+#endif
+
+#ifdef CONFIG_LOG_BACKEND_UART
+	log_backend_uart_init();
+	log_backend_enable(&log_backend_uart,
+			   NULL,
+			   CONFIG_LOG_DEFAULT_LEVEL);
+#endif
+	return 0;
+>>>>>>> c159cac... GPIO frontend added to logger
 }
 
 int log_set_timestamp_func(timestamp_get_t timestamp_getter, u32_t freq)
