@@ -14,11 +14,6 @@
 	#define BASE_ADDRESS 0x50000300
 #endif
 
-_Static_assert((CONFIG_LOG_FRONTEND_PORT_NUMBER == 1) &&
-	       (CONFIG_LOG_FRONTEND_LSB_PIN_NUMBER < 8),
-	       "Pin number for least significant bit on port 1"
-	       "must be less than 8");
-
 #define MASK_OF_LOG_PINS (0x1ff << CONFIG_LOG_FRONTEND_LSB_PIN_NUMBER)
 #define MASK_OF_CLK_PIN BIT(CONFIG_LOG_FRONTEND_LSB_PIN_NUMBER+8)
 #define CLEAR_ADDRESS_OFFSET 0x50C
@@ -581,26 +576,10 @@ void log_frontend_nrf_hexdump(const u8_t *data,
 	);
 	for(int i=0; i<length; i++) {
 		__asm volatile(
-			/* data[i] - first byte */
 			"MOV R0, %[data_i]			\n"
 			"MOV R1, %[base_address]		\n"
 			"MOV R2, %[mask_of_clk_pin]		\n"
 			"MOV R3, %[mask_of_log_pins]		\n"
-			"BFI R2, R0, %[lsb_pin_number], #8	\n"
-			"STR R3, [R1, %[clear_address_offset]]	\n"
-			"STR R2, [R1, %[set_address_offset]]	\n"
-			/* data[i] - second byte */
-			"LSR R0, #8				\n"
-			"BFI R2, R0, %[lsb_pin_number], #8	\n"
-			"STR R3, [R1, %[clear_address_offset]]	\n"
-			"STR R2, [R1, %[set_address_offset]]	\n"
-			/* data[i] - third byte */
-			"LSR R0, #8				\n"
-			"BFI R2, R0, %[lsb_pin_number], #8	\n"
-			"STR R3, [R1, %[clear_address_offset]]	\n"
-			"STR R2, [R1, %[set_address_offset]]	\n"
-			/* data[i] - fourth byte */
-			"LSR R0, #8				\n"
 			"BFI R2, R0, %[lsb_pin_number], #8	\n"
 			"STR R3, [R1, %[clear_address_offset]]	\n"
 			"STR R2, [R1, %[set_address_offset]]	\n"

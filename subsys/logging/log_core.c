@@ -9,6 +9,7 @@
 #include <logging/log_backend.h>
 #include <logging/log_ctrl.h>
 #include <logging/log_output.h>
+#include <logging/log_frontend.h>
 #include <misc/printk.h>
 #include <init.h>
 #include <assert.h>
@@ -60,6 +61,11 @@ static const char *log_strdup_fail_msg = "<log_strdup alloc failed>";
 struct k_mem_slab log_strdup_pool;
 static u8_t __noinit __aligned(sizeof(u32_t))
 		log_strdup_pool_buf[LOG_STRDUP_POOL_BUFFER_SIZE];
+
+#ifdef CONFIG_LOG_BACKEND_RAW_UART
+#include <logging/log_backend_raw_uart.h>
+LOG_BACKEND_RAW_UART_DEFINE(log_backend_raw_uart);
+#endif
 
 static struct log_list_t list;
 static atomic_t initialized;
@@ -304,14 +310,10 @@ void log_hexdump(const char *str,
 		 u32_t length,
 		 struct log_msg_ids src_level)
 {
-<<<<<<< HEAD
-	struct log_msg *msg = log_msg_hexdump_create(str, data, length);
-=======
 	if(IS_ENABLED(CONFIG_LOG_FRONTEND)) {
 		log_frontend_nrf_hexdump(data, length, src_level);
 	} else {
 		struct log_msg *msg = log_msg_hexdump_create(data, length);
->>>>>>> c159cac... GPIO frontend added to logger
 
 		if (msg == NULL) {
 			return;
@@ -482,11 +484,14 @@ void log_init(void)
 	assert(log_backend_count_get() < LOG_FILTERS_NUM_OF_SLOTS);
 	int i;
 
+#ifdef CONFIG_LOG_FRONTEND
+	log_frontend_init();
+#endif
+
 	if (atomic_inc(&initialized) != 0) {
 		return;
 	}
 
-<<<<<<< HEAD
 	/* Assign ids to backends. */
 	for (i = 0; i < log_backend_count_get(); i++) {
 		const struct log_backend *backend = log_backend_get(i);
@@ -523,19 +528,6 @@ void log_thread_set(k_tid_t process_tid)
 	} else {
 		thread_set(process_tid);
 	}
-=======
-#ifdef CONFIG_LOG_FRONTEND
-	log_frontend_init();
-#endif
-
-#ifdef CONFIG_LOG_BACKEND_UART
-	log_backend_uart_init();
-	log_backend_enable(&log_backend_uart,
-			   NULL,
-			   CONFIG_LOG_DEFAULT_LEVEL);
-#endif
-	return 0;
->>>>>>> c159cac... GPIO frontend added to logger
 }
 
 int log_set_timestamp_func(timestamp_get_t timestamp_getter, u32_t freq)

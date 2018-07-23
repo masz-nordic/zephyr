@@ -14,6 +14,7 @@ if LOG
 
 config LOG_RUNTIME_FILTERING
 	bool "Enable runtime reconfiguration of the logger"
+	depends on !LOG_FRONTEND
 	help
 	  Allow runtime configuration of maximal, independent severity
 	  level for instance.
@@ -218,17 +219,34 @@ config LOG_DOMAIN_ID
 	help
 	  In multicore system each application/core must have unique domain ID.
 
+<<<<<<< HEAD
 config LOG_CMDS
 	bool "Enable shell commands"
 	depends on SHELL
 	default y if SHELL
+=======
+choice
+	prompt "Enable UART backend (formatted or raw)"
+	optional
+>>>>>>> 5fddf40... Raw UART backend added to logger
 
 config LOG_BACKEND_UART
-	bool "Enable UART backend"
+	bool "Enable formatted UART backend"
 	depends on UART_CONSOLE
-	default y if !SHELL_BACKEND_SERIAL
 	help
-	  When enabled backend is using UART to output logs.
+	  When enabled backend is using UART to output logs in formatted format.
+
+config LOG_BACKEND_RAW_UART
+	bool "Enable raw UART backend"
+	depends on UART_CONSOLE
+<<<<<<< HEAD
+	default y if !SHELL_BACKEND_SERIAL
+=======
+>>>>>>> 5fddf40... Raw UART backend added to logger
+	help
+	  When enabled backend is using UART to output logs in raw format.
+
+endchoice
 
 config LOG_BACKEND_SWO
 	bool "Enable Serial Wire Output (SWO) backend"
@@ -462,6 +480,5 @@ config LOG_FRONTEND_HEXDUMP_MAX_LENGTH
 	int "Maximal allowed length in bytes for hexdump logs"
 	depends on LOG_FRONTEND
 	default 16
-
 endif
 endmenu
