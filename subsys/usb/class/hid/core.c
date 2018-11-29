@@ -89,6 +89,62 @@ static struct hid_device_info {
 	const struct hid_ops *ops;
 } hid_device;
 
+int hid_on_get_idle(struct usb_setup_packet *setup, s32_t *len, u8_t **data)
+{
+	LOG_DBG("Get Idle callback");
+
+	/* TODO: Do something. */
+
+	return -ENOTSUP;
+}
+
+int hid_on_get_report(struct usb_setup_packet *setup, s32_t *len, u8_t **data)
+{
+	LOG_DBG("Get Report callback");
+
+	/* TODO: Do something. */
+
+	return 0;
+}
+
+int hid_on_get_protocol(struct usb_setup_packet *setup, s32_t *len,
+			u8_t **data)
+{
+	LOG_DBG("Get Protocol callback");
+
+	/* TODO: Do something. */
+
+	return -ENOTSUP;
+}
+
+int hid_on_set_idle(struct usb_setup_packet *setup, s32_t *len, u8_t **data)
+{
+	LOG_DBG("Set Idle callback");
+
+	/* TODO: Do something. */
+
+	return 0;
+}
+
+int hid_on_set_report(struct usb_setup_packet *setup, s32_t *len, u8_t **data)
+{
+	LOG_DBG("Set Report callback");
+
+	/* TODO: Do something. */
+
+	return -ENOTSUP;
+}
+
+int hid_on_set_protocol(struct usb_setup_packet *setup, s32_t *len,
+			u8_t **data)
+{
+	LOG_DBG("Set Protocol callback");
+
+	/* TODO: Do something. */
+
+	return -ENOTSUP;
+}
+
 static void usb_set_hid_report_size(u16_t size)
 {
 	sys_put_le16(size,
@@ -140,14 +196,31 @@ static int hid_class_handle_req(struct usb_setup_packet *setup,
 
 	if (REQTYPE_GET_DIR(setup->bmRequestType) == REQTYPE_DIR_TO_HOST) {
 		switch (setup->bRequest) {
+		case HID_GET_IDLE:
+			LOG_DBG("Get Idle");
+			if (hid_device.ops->get_idle) {
+				return hid_device.ops->get_idle(setup, len,
+								data);
+			} else {
+				return hid_on_get_idle(setup, len, data);
+			}
+			break;
 		case HID_GET_REPORT:
 			LOG_DBG("Get Report");
 			if (hid_device.ops->get_report) {
 				return hid_device.ops->get_report(setup, len,
 								  data);
 			} else {
-				LOG_ERR("Mandatory request not supported");
-				return -EINVAL;
+				return hid_on_get_report(setup, len, data);
+			}
+			break;
+		case HID_GET_PROTOCOL:
+			LOG_DBG("Get Protocol");
+			if (hid_device.ops->get_protocol) {
+				return hid_device.ops->get_protocol(setup, len,
+								    data);
+			} else {
+				return hid_on_get_protocol(setup, len, data);
 			}
 			break;
 		default:
@@ -161,14 +234,28 @@ static int hid_class_handle_req(struct usb_setup_packet *setup,
 			if (hid_device.ops->set_idle) {
 				return hid_device.ops->set_idle(setup, len,
 								data);
+			} else {
+				return hid_on_set_idle(setup, len, data);
 			}
 			break;
 		case HID_SET_REPORT:
-			if (hid_device.ops->set_report == NULL) {
-				LOG_ERR("set_report not implemented");
-				return -EINVAL;
+			LOG_DBG("Set Report");
+			if (hid_device.ops->set_report) {
+				return hid_device.ops->set_report(setup, len,
+								  data);
+			} else {
+				return hid_on_set_report(setup, len, data);
 			}
-			return hid_device.ops->set_report(setup, len, data);
+			break;
+		case HID_SET_PROTOCOL:
+			LOG_DBG("Set Protocol");
+			if (hid_device.ops->set_protocol) {
+				return hid_device.ops->set_protocol(setup, len,
+								    data);
+			} else {
+				return hid_on_set_protocol(setup, len, data);
+			}
+			break;
 		default:
 			LOG_ERR("Unhandled request 0x%x", setup->bRequest);
 			break;
@@ -337,3 +424,4 @@ int hid_int_ep_read(u8_t *data, u32_t max_data_len, u32_t *ret_bytes)
 	return -ENOTSUP;
 #endif
 }
+
