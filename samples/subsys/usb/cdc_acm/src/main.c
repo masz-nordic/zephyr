@@ -18,6 +18,10 @@
 #include <uart.h>
 #include <zephyr.h>
 
+#define LOG_LEVEL LOG_LEVEL_DBG
+#include <logging/log.h>
+LOG_MODULE_REGISTER(app);
+
 static const char *banner1 = "Send characters to the UART device\r\n";
 static const char *banner2 = "Characters read:\r\n";
 
@@ -80,35 +84,35 @@ void main(void)
 
 	dev = device_get_binding(CONFIG_CDC_ACM_PORT_NAME_0);
 	if (!dev) {
-		printf("CDC ACM device not found\n");
+		LOG_ERR("CDC ACM device not found");
 		return;
 	}
 
-	printf("Wait for DTR\n");
+	LOG_INF("Wait for DTR");
 	while (1) {
 		uart_line_ctrl_get(dev, LINE_CTRL_DTR, &dtr);
 		if (dtr)
 			break;
 	}
-	printf("DTR set, start test\n");
+	LOG_INF("DTR set, start test");
 
 	/* They are optional, we use them to test the interrupt endpoint */
 	ret = uart_line_ctrl_set(dev, LINE_CTRL_DCD, 1);
 	if (ret)
-		printf("Failed to set DCD, ret code %d\n", ret);
+		LOG_WRN("Failed to set DCD, ret code %d", ret);
 
 	ret = uart_line_ctrl_set(dev, LINE_CTRL_DSR, 1);
 	if (ret)
-		printf("Failed to set DSR, ret code %d\n", ret);
+		LOG_WRN("Failed to set DSR, ret code %d", ret);
 
 	/* Wait 1 sec for the host to do all settings */
 	k_busy_wait(1000000);
 
 	ret = uart_line_ctrl_get(dev, LINE_CTRL_BAUD_RATE, &baudrate);
 	if (ret)
-		printf("Failed to get baudrate, ret code %d\n", ret);
+		LOG_WRN("Failed to get baudrate, ret code %d", ret);
 	else
-		printf("Baudrate detected: %d\n", baudrate);
+		LOG_INF("Baudrate detected: %d", baudrate);
 
 	uart_irq_callback_set(dev, interrupt_handler);
 	write_data(dev, banner1, strlen(banner1));
