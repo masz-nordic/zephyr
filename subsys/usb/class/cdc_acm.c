@@ -61,10 +61,10 @@ LOG_MODULE_REGISTER(usb_cdc_acm);
 	((struct cdc_acm_dev_data_t * const)(dev)->driver_data)
 
 /* 115200bps, no parity, 1 stop bit, 8bit char */
-#define CDC_ACM_DEFAUL_BAUDRATE {sys_cpu_to_le32(115200), 0, 0, 8}
+#define CDC_ACM_DEFAUL_BAUDRATE {0, 0, 0, 0}
 
 /* Size of the internal buffer used for storing received data */
-#define CDC_ACM_BUFFER_SIZE (2 * CONFIG_CDC_ACM_BULK_EP_MPS)
+#define CDC_ACM_BUFFER_SIZE (CONFIG_CDC_ACM_BULK_EP_MPS)
 
 
 /* Max CDC ACM class request max data size */
@@ -84,7 +84,7 @@ LOG_MODULE_REGISTER(usb_cdc_acm);
 #define ACM_IF0_STRING			"ACM-CDC"
 
 struct usb_cdc_acm_config {
-#ifdef CONFIG_USB_COMPOSITE_DEVICE
+#if 1
 	struct usb_association_descriptor iad_cdc;
 #endif
 	struct usb_if_descriptor if0;
@@ -298,6 +298,7 @@ static void cdc_acm_bulk_in(u8_t ep, enum usb_dc_ep_cb_status_code ep_status)
 	k_sem_give(&poll_wait_sem);
 	/* Call callback only if tx irq ena */
 	if (dev_data->cb && dev_data->tx_irq_ena) {
+		LOG_ERR("SUBMIT IN");
 		k_work_submit(&dev_data->cb_work);
 	}
 }
@@ -313,11 +314,12 @@ static void cdc_acm_bulk_in(u8_t ep, enum usb_dc_ep_cb_status_code ep_status)
 static void cdc_acm_bulk_out(u8_t ep, enum usb_dc_ep_cb_status_code ep_status)
 {
 	struct cdc_acm_dev_data_t *dev_data;
-	u32_t bytes_to_read, i, j, buf_head;
+	u32_t bytes_to_read, buf_head;
 	struct usb_dev_data *common;
-	u8_t tmp_buf[4];
 
 	ARG_UNUSED(ep_status);
+
+	LOG_ERR("BULK OUT");
 
 	common = usb_get_dev_data_by_ep(&cdc_acm_data_devlist, ep);
 	if (common == NULL) {
@@ -332,10 +334,14 @@ static void cdc_acm_bulk_out(u8_t ep, enum usb_dc_ep_cb_status_code ep_status)
 
 	buf_head = dev_data->rx_buf_head;
 
-	/*
+
+#if 0
+	/*CONFIG_SOC_SERIES_QUARK_SE
 	 * Quark SE USB controller is always storing data
 	 * in the FIFOs per 32-bit words.
 	 */
+	u32_t i, j;
+	u8_t tmp_buf[4];
 	for (i = 0U; i < bytes_to_read; i += 4) {
 		usb_read(ep, tmp_buf, 4, NULL);
 
@@ -348,18 +354,58 @@ static void cdc_acm_bulk_out(u8_t ep, enum usb_dc_ep_cb_status_code ep_status)
 			if (((buf_head + 1) % CDC_ACM_BUFFER_SIZE) ==
 			    dev_data->rx_buf_tail) {
 				/* FIFO full, discard data */
-				LOG_ERR("CDC buffer full!");
+				LOG_ERR("CDC buffer full! %d %d %d", buf_head,
+					bytes_to_read, dev_data->rx_buf_tail);
 			} else {
 				dev_data->rx_buf[buf_head] = tmp_buf[j];
 				buf_head = (buf_head + 1) % CDC_ACM_BUFFER_SIZE;
+			LOG_ERR("CDC buffer OK! %d %d", buf_head,
+				bytes_to_read);
 			}
 		}
 	}
+#else
+	if (buf_head >= dev_data->rx_buf_tail) {
+		if (buf_head + bytes_to_read >= CDC_ACM_BUFFER_SIZE) {
+			if ((buf_head + bytes_to_read - CDC_ACM_BUFFER_SIZE)
+			    >= dev_data->rx_buf_tail) {
+				LOG_ERR("CDC buffer full! %d %d", buf_head,
+					bytes_to_read);
+			} else {
+				usb_read(ep, &dev_data->rx_buf[buf_head],
+					 bytes_to_read, NULL);
+				buf_head = buf_head + bytes_to_read
+					   - CDC_ACM_BUFFER_SIZE;
+				LOG_ERR("CDC buffer OK! %d %d", buf_head,
+					bytes_to_read);
+			}
+		} else {
+			usb_read(ep, &dev_data->rx_buf[buf_head],
+				 bytes_to_read, NULL);
+			buf_head = buf_head + bytes_to_read;
+			LOG_ERR("CDC buffer OK! 2! %d %d", buf_head,
+				bytes_to_read);
+		}
+	} else {
+		if (buf_head + bytes_to_read >= dev_data->rx_buf_tail) {
+			LOG_ERR("CDC buffer full! %d %d %d", buf_head,
+				bytes_to_read, dev_data->rx_buf_tail);
+		} else {
+			usb_read(ep, &dev_data->rx_buf[buf_head],
+				 bytes_to_read, NULL);
+			buf_head = buf_head + bytes_to_read;
+
+			LOG_ERR("CDC buffer OK! 3! %d %d", buf_head,
+				bytes_to_read);
+		}
+	}
+#endif
 
 	dev_data->rx_buf_head = buf_head;
 	dev_data->rx_ready = 1U;
 	/* Call callback only if rx irq ena */
 	if (dev_data->cb && dev_data->rx_irq_ena) {
+		LOG_ERR("SUBMIT OUT");
 		k_work_submit(&dev_data->cb_work);
 	}
 }
@@ -649,8 +695,13 @@ static int cdc_acm_fifo_read(struct device *dev, u8_t *rx_data,
 
 	if (dev_data->rx_buf_tail == dev_data->rx_buf_head) {
 		/* Buffer empty */
+#if 0
 		dev_data->rx_ready = 0U;
+#endif
 	}
+
+	LOG_ERR("Tail: %d, avail: %d, rx_rdy: %d", dev_data->rx_buf_tail,
+		avail_data, dev_data->rx_ready);
 
 	return bytes_read;
 }
@@ -1023,7 +1074,7 @@ static const struct uart_driver_api cdc_acm_driver_api = {
 	}
 #endif /* CONFIG_USB_COMPOSITE_DEVICE */
 
-#if CONFIG_USB_COMPOSITE_DEVICE
+#if 1
 #define DEFINE_CDC_ACM_DESCR(x, int_ep_addr, out_ep_addr, in_ep_addr)	\
 	USBD_CLASS_DESCR_DEFINE(primary, x)				\
 	struct usb_cdc_acm_config cdc_acm_cfg_##x = {			\
@@ -1036,7 +1087,7 @@ static const struct uart_driver_api cdc_acm_driver_api = {
 	.if0_union = INITIALIZER_IF_UNION,				\
 	.if0_int_ep = INITIALIZER_IF_EP(int_ep_addr,			\
 					USB_DC_EP_INTERRUPT,		\
-					CONFIG_CDC_ACM_INTERRUPT_EP_MPS,\
+					64,\
 					0x0A),				\
 	.if1 = INITIALIZER_IF(1, 2, COMMUNICATION_DEVICE_CLASS_DATA, 0),\
 	.if1_in_ep = INITIALIZER_IF_EP(in_ep_addr,			\
@@ -1060,7 +1111,7 @@ static const struct uart_driver_api cdc_acm_driver_api = {
 	.if0_union = INITIALIZER_IF_UNION,				\
 	.if0_int_ep = INITIALIZER_IF_EP(int_ep_addr,			\
 					USB_DC_EP_INTERRUPT,		\
-					CONFIG_CDC_ACM_INTERRUPT_EP_MPS,\
+					64,\
 					0x0A),				\
 	.if1 = INITIALIZER_IF(1, 2, COMMUNICATION_DEVICE_CLASS_DATA, 0),\
 	.if1_in_ep = INITIALIZER_IF_EP(in_ep_addr,			\
