@@ -16,7 +16,7 @@ extern const struct log_backend_api log_backend_raw_uart_api;
  * @param _name Name of the instance.
  */
 #define LOG_BACKEND_RAW_UART_DEFINE(_name) \
-	LOG_BACKEND_DEFINE(_name, log_backend_raw_uart_api)
+	LOG_BACKEND_DEFINE(_name, log_backend_raw_uart_api, true)
 
 #ifdef __cplusplus
 }

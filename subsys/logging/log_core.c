@@ -36,6 +36,8 @@ LOG_MODULE_REGISTER(log);
 
 #ifndef CONFIG_LOG_STRDUP_MAX_STRING
 #define CONFIG_LOG_STRDUP_MAX_STRING 0
+#endif
+
 #ifdef CONFIG_LOG_FRONTEND
 #include <logging/log_frontend.h>
 #endif
@@ -313,7 +315,7 @@ void log_hexdump(const char *str,
 	if(IS_ENABLED(CONFIG_LOG_FRONTEND)) {
 		log_frontend_nrf_hexdump(data, length, src_level);
 	} else {
-		struct log_msg *msg = log_msg_hexdump_create(data, length);
+		struct log_msg *msg = log_msg_hexdump_create(str, data, length);
 
 		if (msg == NULL) {
 			return;

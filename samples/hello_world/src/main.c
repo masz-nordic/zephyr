@@ -6,8 +6,10 @@
 
 #include <zephyr.h>
 #include <misc/printk.h>
+#include <logging/log.h>
+LOG_MODULE_REGISTER(app, LOG_LEVEL_DBG);
 
 void main(void)
 {
-	printk("Hello World! %s\n", CONFIG_BOARD);
+	LOG_ERR("Hello World!");
 }

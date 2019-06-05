@@ -51,7 +51,7 @@ static void send_raw_hexdump_uart(struct log_msg *msg, void *ctx)
 	uart_poll_out(dev, 0xff);
 	uart_poll_out(dev, 0xff);
 	uart_poll_out(dev, 0xff);
-	if(msg->hdr.params.hexdump.raw_string == 0) {
+	if(msg->hdr.ids.level != 0) {
 		uart_poll_out(dev, 0xff);
 	} else {
 		uart_poll_out(dev, 0xfe);
@@ -63,7 +63,7 @@ static void send_raw_hexdump_uart(struct log_msg *msg, void *ctx)
 	uart_poll_out(dev, (u8_t)(msg->hdr.params.hexdump.length >> 24));
 
 	for(int i=0; i < (msg->hdr.params.hexdump.length); i++) {;
-		uart_poll_out(dev, msg->data.data.bytes[i]);
+		uart_poll_out(dev, msg->payload.single.bytes[i]);
 	}
 
 	uart_poll_out(dev, (u8_t)log_msg_ids_bytes.raw);

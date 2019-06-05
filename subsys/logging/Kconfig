@@ -219,16 +219,15 @@ config LOG_DOMAIN_ID
 	help
 	  In multicore system each application/core must have unique domain ID.
 
-<<<<<<< HEAD
 config LOG_CMDS
 	bool "Enable shell commands"
 	depends on SHELL
 	default y if SHELL
-=======
+	default y if !SHELL_BACKEND_SERIAL
+
 choice
 	prompt "Enable UART backend (formatted or raw)"
 	optional
->>>>>>> 5fddf40... Raw UART backend added to logger
 
 config LOG_BACKEND_UART
 	bool "Enable formatted UART backend"
@@ -239,10 +238,6 @@ config LOG_BACKEND_UART
 config LOG_BACKEND_RAW_UART
 	bool "Enable raw UART backend"
 	depends on UART_CONSOLE
-<<<<<<< HEAD
-	default y if !SHELL_BACKEND_SERIAL
-=======
->>>>>>> 5fddf40... Raw UART backend added to logger
 	help
 	  When enabled backend is using UART to output logs in raw format.
 
@@ -481,4 +476,3 @@ config LOG_FRONTEND_HEXDUMP_MAX_LENGTH
 	depends on LOG_FRONTEND
 	default 16
 endif
-endmenu
