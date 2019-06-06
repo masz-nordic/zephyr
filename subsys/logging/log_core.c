@@ -42,11 +42,6 @@ LOG_MODULE_REGISTER(log);
 #include <logging/log_frontend.h>
 #endif
 
-#ifdef CONFIG_LOG_BACKEND_UART
-#include <logging/log_backend_uart.h>
-LOG_BACKEND_UART_DEFINE(log_backend_uart);
-#endif
-
 #ifndef CONFIG_LOG_STRDUP_BUF_COUNT
 #define CONFIG_LOG_STRDUP_BUF_COUNT 0
 #endif
@@ -63,11 +58,6 @@ static const char *log_strdup_fail_msg = "<log_strdup alloc failed>";
 struct k_mem_slab log_strdup_pool;
 static u8_t __noinit __aligned(sizeof(u32_t))
 		log_strdup_pool_buf[LOG_STRDUP_POOL_BUFFER_SIZE];
-
-#ifdef CONFIG_LOG_BACKEND_RAW_UART
-#include <logging/log_backend_raw_uart.h>
-LOG_BACKEND_RAW_UART_DEFINE(log_backend_raw_uart);
-#endif
 
 static struct log_list_t list;
 static atomic_t initialized;

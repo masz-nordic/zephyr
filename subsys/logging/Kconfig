@@ -223,7 +223,6 @@ config LOG_CMDS
 	bool "Enable shell commands"
 	depends on SHELL
 	default y if SHELL
-	default y if !SHELL_BACKEND_SERIAL
 
 choice
 	prompt "Enable UART backend (formatted or raw)"
