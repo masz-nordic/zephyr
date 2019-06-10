@@ -18,6 +18,8 @@ union log_msg_ids_convert {
 	u16_t raw;
 };
 
+static const uint8_t sync_frame[] = {0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68};
+
 static void send_raw_std_uart(struct log_msg *msg, void *ctx)
 {
 	struct device *dev = (struct device *)ctx;
@@ -91,6 +93,10 @@ static void put(const struct log_backend *const backend,
 void log_backend_raw_uart_init(void)
 {
 	ctx = device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
+
+	for (uint8_t i=0; i < sizeof(sync_frame); i++) {
+		uart_poll_out(ctx, sync_frame[i]);
+	}
 }
 
 static void panic(struct log_backend const *const backend)
