@@ -25,10 +25,21 @@ union log_msg_ids_convert {
 	u16_t raw;
 };
 
+static const uint8_t sync_frame[] = {0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68};
+
 void log_frontend_init()
 {
 	nrf_gpio_port_dir_output_set(LOG_FRONTEND_GPIO_REG_PTR,
 				     MASK_OF_LOG_PINS);
+
+	for (uint8_t i=0; i < sizeof(sync_frame); i++) {
+		u32_t mask_to_set = MASK_OF_CLK_PIN |
+				    (sync_frame[i] << CONFIG_LOG_FRONTEND_LSB_PIN_NUMBER);
+		nrf_gpio_port_out_set(LOG_FRONTEND_GPIO_REG_PTR, mask_to_set);
+		nrf_gpio_port_out_clear(LOG_FRONTEND_GPIO_REG_PTR, MASK_OF_LOG_PINS);
+	}
+
+	nrf_gpio_port_out_clear(LOG_FRONTEND_GPIO_REG_PTR, MASK_OF_LOG_PINS);
 }
 
 void log_frontend_nrf_0(const char *str, struct log_msg_ids src_level)
