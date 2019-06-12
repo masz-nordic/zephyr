@@ -35,11 +35,9 @@ void log_frontend_init()
 	for (uint8_t i=0; i < sizeof(sync_frame); i++) {
 		u32_t mask_to_set = MASK_OF_CLK_PIN |
 				    (sync_frame[i] << CONFIG_LOG_FRONTEND_LSB_PIN_NUMBER);
-		nrf_gpio_port_out_set(LOG_FRONTEND_GPIO_REG_PTR, mask_to_set);
 		nrf_gpio_port_out_clear(LOG_FRONTEND_GPIO_REG_PTR, MASK_OF_LOG_PINS);
+		nrf_gpio_port_out_set(LOG_FRONTEND_GPIO_REG_PTR, mask_to_set);
 	}
-
-	nrf_gpio_port_out_clear(LOG_FRONTEND_GPIO_REG_PTR, MASK_OF_LOG_PINS);
 }
 
 void log_frontend_nrf_0(const char *str, struct log_msg_ids src_level)
