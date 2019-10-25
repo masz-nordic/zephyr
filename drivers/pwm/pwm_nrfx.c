@@ -259,6 +259,7 @@ static int pwm_nrfx_init(struct device *dev)
 
 	nrfx_err_t result = nrfx_pwm_init(&config->pwm,
 					  &config->initial_config,
+					  NULL,
 					  NULL);
 	if (result != NRFX_SUCCESS) {
 		LOG_ERR("Failed to initialize device: %s", dev->config->name);
@@ -371,10 +372,10 @@ static int pwm_nrfx_pm_control(struct device *dev,
 			PWM_NRFX_DEFAULT_VALUE(idx, 2),			      \
 			PWM_NRFX_DEFAULT_VALUE(idx, 3),			      \
 		},							      \
-		.countertop = NRFX_PWM_DEFAULT_CONFIG_TOP_VALUE,	      \
-		.prescaler = NRFX_PWM_DEFAULT_CONFIG_BASE_CLOCK 	      \
+		.countertop = 1000,					      \
+		.prescaler = NRF_PWM_CLK_1MHz				      \
 	};								      \
-	static const struct pwm_nrfx_config pwm_nrfx_##idx##z_config = {	      \
+	static const struct pwm_nrfx_config pwm_nrfx_##idx##_config = {	      \
 		.pwm = NRFX_PWM_INSTANCE(idx),				      \
 		.initial_config = {					      \
 			.output_pins = {				      \
@@ -383,9 +384,9 @@ static int pwm_nrfx_pm_control(struct device *dev,
 				PWM_NRFX_OUTPUT_PIN(idx, 2),		      \
 				PWM_NRFX_OUTPUT_PIN(idx, 3),		      \
 			},						      \
-			.base_clock = NRFX_PWM_DEFAULT_CONFIG_BASE_CLOCK,     \
-			.count_mode = PWM_NRFX_COUNT_MODE(idx),               \
-			.top_value = NRFX_PWM_DEFAULT_CONFIG_TOP_VALUE,	      \
+			.base_clock = NRF_PWM_CLK_1MHz,			      \
+			.count_mode = PWM_NRFX_COUNT_MODE(idx),		      \
+			.top_value = 1000,				      \
 			.load_mode = NRF_PWM_LOAD_INDIVIDUAL,		      \
 			.step_mode = NRF_PWM_STEP_TRIGGERED,		      \
 		},							      \
@@ -397,7 +398,7 @@ static int pwm_nrfx_pm_control(struct device *dev,
 		      DT_NORDIC_NRF_PWM_PWM_##idx##_LABEL,		      \
 		      pwm_nrfx_init, pwm_##idx##_nrfx_pm_control,	      \
 		      &pwm_nrfx_##idx##_data,				      \
-		      &pwm_nrfx_##idx##z_config,				      \
+		      &pwm_nrfx_##idx##_config,				      \
 		      POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,	      \
 		      &pwm_nrfx_drv_api_funcs)
 
