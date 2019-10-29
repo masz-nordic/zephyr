@@ -29,6 +29,7 @@
 		gpio-0 = &gpio0;
 		gpiote-0 = &gpiote;
 		wdt-0 = &wdt;
+		pdm-0 = &pdm0;
 		pwm-0 = &pwm0;
 		qdec-0 = &qdec;
 		rtc-0 = &rtc0;
@@ -122,6 +123,14 @@
 			interrupts = <3 1>;
 			status = "disabled";
 			label = "I2C_0";
+		};
+
+		pdm0: pdm@4001d000 {
+			compatible = "nordic,nrf-pdm";
+			reg = <0x4001d000 0x1000>;
+			interrupts = <29 1>;
+			status = "disabled";
+			label = "PDM_0";
 		};
 
 		pwm0: pwm@4001c000 {
