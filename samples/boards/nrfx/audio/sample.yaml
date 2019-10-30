@@ -1,0 +1,6 @@
+sample:
+  name: nrfx audio sample
+tests:
+  sample.board.nrfx.audio:
+    platform_whitelist: nrf52840_pca10056
+    tags: board

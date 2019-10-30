@@ -1,0 +1,6 @@
+&pdm0 {
+	status = "okay";
+	clk-pin = <10>;
+	din-pin = <11>;
+};
+
