@@ -32,7 +32,7 @@ void main(void)
 		    nrfx_isr, nrfx_gpiote_irq_handler, 0);
 
 	/* Initialize GPIOTE */
-	err = nrfx_gpiote_init();
+	err = nrfx_gpiote_init(DT_NORDIC_NRF_GPIOTE_GPIOTE_0_IRQ_0_PRIORITY);
 	if (err != NRFX_SUCCESS) {
 		LOG_ERR("nrfx_gpiote_init error: %08x", err);
 		return;
@@ -90,9 +90,11 @@ void main(void)
 	 * is pressed, the LED pin will be toggled.
 	 */
 	nrf_gpiote_publish_set(
+		NRF_GPIOTE,
 		nrfx_gpiote_in_event_get(INPUT_PIN),
 		channel);
 	nrf_gpiote_subscribe_set(
+		NRF_GPIOTE,
 		nrfx_gpiote_out_task_get(OUTPUT_PIN),
 		channel);
 
