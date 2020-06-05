@@ -20,7 +20,11 @@
 #include <drivers/usb/usb_dc.h>
 #include <usb/usb_device.h>
 #include <drivers/clock_control.h>
+#if defined(CONFIG_SOC_SERIES_NRF53X)
+#include <hal/nrf_usbreg.h>
+#else
 #include <hal/nrf_power.h>
+#endif
 #include <drivers/clock_control/nrf_clock_control.h>
 #include <nrfx_usbd.h>
 
@@ -65,6 +69,21 @@ enum usbd_event_type {
 	USBD_EVT_RESET,
 	USBD_EVT_SOF,
 	USBD_EVT_REINIT
+};
+
+/**
+ * @brief USBD peripheral power event types.
+ */
+enum usbd_power_event_type {
+#if defined(CONFIG_SOC_SERIES_NRF53X)
+	USBD_PWR_EVT_DETECTED = NRF_USBREG_EVENT_USBDETECTED,
+	USBD_PWR_EVT_REMOVED  = NRF_USBREG_EVENT_USBREMOVED,
+	USBD_PWR_EVT_READY    = NRF_USBREG_EVENT_USBPWRRDY,
+#else
+	USBD_PWR_EVT_DETECTED = NRF_POWER_EVENT_USBDETECTED,
+	USBD_PWR_EVT_REMOVED  = NRF_POWER_EVENT_USBREMOVED,
+	USBD_PWR_EVT_READY    = NRF_POWER_EVENT_USBPWRRDY,
+#endif
 };
 
 /**
@@ -487,18 +506,18 @@ static inline struct usbd_event *usbd_evt_alloc(void)
 	return ev;
 }
 
-void usb_dc_nrfx_power_event_callback(nrf_power_event_t event)
+void usb_dc_nrfx_power_event_callback(enum usbd_power_event_type event)
 {
 	enum usbd_periph_state new_state;
 
 	switch (event) {
-	case NRF_POWER_EVENT_USBDETECTED:
+	case USBD_PWR_EVT_DETECTED:
 		new_state = USBD_ATTACHED;
 		break;
-	case NRF_POWER_EVENT_USBPWRRDY:
+	case USBD_PWR_EVT_READY:
 		new_state = USBD_POWERED;
 		break;
-	case NRF_POWER_EVENT_USBREMOVED:
+	case USBD_PWR_EVT_REMOVED:
 		new_state = USBD_DETACHED;
 		break;
 	default:
@@ -1230,6 +1249,7 @@ static inline void usbd_reinit(void)
 	nrfx_err_t err;
 
 	nrf5_power_usb_power_int_enable(false);
+
 	nrfx_usbd_disable();
 	nrfx_usbd_uninit();
 
@@ -1238,6 +1258,7 @@ static inline void usbd_reinit(void)
 	__ASSERT_NO_MSG(ret == 0);
 
 	nrf5_power_usb_power_int_enable(true);
+
 	err = nrfx_usbd_init(usbd_event_handler);
 
 	if (err != NRFX_SUCCESS) {
@@ -1373,6 +1394,7 @@ int usb_dc_attach(void)
 		LOG_DBG("nRF USBD driver init failed. Code: %d", (u32_t)err);
 		return -EIO;
 	}
+
 	nrf5_power_usb_power_int_enable(true);
 
 	ret = eps_ctx_init();
@@ -1384,7 +1406,11 @@ int usb_dc_attach(void)
 		usbd_work_schedule();
 	}
 
+#if defined(CONFIG_SOC_SERIES_NRF53X)
+	if (nrf_usbreg_status_get(NRF_USBREGULATOR) & NRF_USBREG_STATUS_VBUSDETECT_MASK) {
+#else
 	if (nrf_power_usbregstatus_vbusdet_get(NRF_POWER)) {
+#endif
 		/* USBDETECTED event is be generated on cable attachment and
 		 * when cable is already attached during reset, but not when
 		 * the peripheral is re-enabled.
@@ -1392,7 +1418,7 @@ int usb_dc_attach(void)
 		 * will not receive this event and it needs to be generated
 		 * again here.
 		 */
-		usb_dc_nrfx_power_event_callback(NRF_POWER_EVENT_USBDETECTED);
+		usb_dc_nrfx_power_event_callback(USBD_PWR_EVT_DETECTED);
 	}
 
 	return ret;

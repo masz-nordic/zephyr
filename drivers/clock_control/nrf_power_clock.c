@@ -10,7 +10,11 @@
 #include <drivers/clock_control/nrf_clock_control.h>
 #include "nrf_clock_calibration.h"
 #include <logging/log.h>
+#if defined(CONFIG_SOC_SERIES_NRF53X)
+#include <hal/nrf_usbreg.h>
+#else
 #include <hal/nrf_power.h>
+#endif
 
 LOG_MODULE_REGISTER(clock_control, CONFIG_CLOCK_CONTROL_LOG_LEVEL);
 
@@ -58,6 +62,30 @@ struct nrf_clock_control_config {
 					subsys[CLOCK_CONTROL_NRF_TYPE_COUNT];
 };
 
+enum usbd_power_int {
+#if defined(CONFIG_SOC_SERIES_NRF53X)
+	USBD_PWR_INT_DETECTED = NRF_USBREG_INT_USBDETECTED,
+	USBD_PWR_INT_REMOVED  = NRF_USBREG_INT_USBREMOVED,
+	USBD_PWR_INT_READY    = NRF_USBREG_INT_USBPWRRDY,
+#else
+	USBD_PWR_INT_DETECTED = NRF_POWER_INT_USBDETECTED_MASK,
+	USBD_PWR_INT_REMOVED  = NRF_POWER_INT_USBREMOVED_MASK,
+	USBD_PWR_INT_READY    = NRF_POWER_INT_USBPWRRDY_MASK,
+#endif
+};
+
+enum usbd_power_event_type {
+#if defined(CONFIG_SOC_SERIES_NRF53X)
+	USBD_PWR_EVT_DETECTED = NRF_USBREG_EVENT_USBDETECTED,
+	USBD_PWR_EVT_REMOVED  = NRF_USBREG_EVENT_USBREMOVED,
+	USBD_PWR_EVT_READY    = NRF_USBREG_EVENT_USBPWRRDY,
+#else
+	USBD_PWR_EVT_DETECTED = NRF_POWER_EVENT_USBDETECTED,
+	USBD_PWR_EVT_REMOVED  = NRF_POWER_EVENT_USBREMOVED,
+	USBD_PWR_EVT_READY    = NRF_POWER_EVENT_USBPWRRDY,
+#endif
+};
+
 static void clkstarted_handle(struct device *dev,
 			      enum clock_control_nrf_type type);
 
@@ -78,26 +106,50 @@ static bool clock_event_check_and_clean(nrf_clock_event_t evt, u32_t intmask)
 
 static void clock_irqs_disable(void)
 {
+#if defined(CONFIG_SOC_SERIES_NRF53X)
+	nrf_clock_int_disable(NRF_CLOCK,
+			(NRF_CLOCK_INT_HF_STARTED_MASK |
+			 NRF_CLOCK_INT_LF_STARTED_MASK));
+#if CONFIG_USB_NRFX
+	nrf_usbreg_int_disable(NRF_USBREGULATOR,
+			(NRF_USBREG_INT_USBDETECTED |
+			 NRF_USBREG_INT_USBREMOVED  |
+			 NRF_USBREG_INT_USBPWRRDY));
+#endif
+#else
 	nrf_clock_int_disable(NRF_CLOCK,
 			(NRF_CLOCK_INT_HF_STARTED_MASK |
 			 NRF_CLOCK_INT_LF_STARTED_MASK |
 			 COND_CODE_1(CONFIG_USB_NRFX,
 				(NRF_POWER_INT_USBDETECTED_MASK |
-				 NRF_POWER_INT_USBREMOVED_MASK |
+				 NRF_POWER_INT_USBREMOVED_MASK  |
 				 NRF_POWER_INT_USBPWRRDY_MASK),
 				(0))));
+#endif
 }
 
 static void clock_irqs_enable(void)
 {
+#if defined(CONFIG_SOC_SERIES_NRF53X)
+	nrf_clock_int_enable(NRF_CLOCK,
+			(NRF_CLOCK_INT_HF_STARTED_MASK |
+			 NRF_CLOCK_INT_LF_STARTED_MASK));
+#if CONFIG_USB_NRFX
+	nrf_usbreg_int_enable(NRF_USBREGULATOR,
+			(NRF_USBREG_INT_USBDETECTED |
+			 NRF_USBREG_INT_USBREMOVED  |
+			 NRF_USBREG_INT_USBPWRRDY));
+#endif
+#else
 	nrf_clock_int_enable(NRF_CLOCK,
 			(NRF_CLOCK_INT_HF_STARTED_MASK |
 			 NRF_CLOCK_INT_LF_STARTED_MASK |
 			 COND_CODE_1(CONFIG_USB_NRFX,
 				(NRF_POWER_INT_USBDETECTED_MASK |
-				 NRF_POWER_INT_USBREMOVED_MASK |
+				 NRF_POWER_INT_USBREMOVED_MASK  |
 				 NRF_POWER_INT_USBPWRRDY_MASK),
 				(0))));
+#endif
 }
 
 static struct nrf_clock_control_sub_data *get_sub_data(struct device *dev,
@@ -302,10 +354,16 @@ void nrf_power_clock_isr(void *arg);
 
 static int clk_init(struct device *dev)
 {
+	LOG_ERR("CLK INIT");
 	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
 		    nrf_power_clock_isr, 0, 0);
 
 	irq_enable(DT_INST_IRQN(0));
+
+	IRQ_CONNECT(55, DT_INST_IRQ(0, priority),
+		    nrf_power_clock_isr, 0, 0);
+
+	irq_enable(55);
 
 	nrf_clock_lf_src_set(NRF_CLOCK, CLOCK_CONTROL_NRF_K32SRC);
 
@@ -369,8 +427,19 @@ static void clkstarted_handle(struct device *dev,
 }
 
 #if defined(CONFIG_USB_NRFX)
-static bool power_event_check_and_clean(nrf_power_event_t evt, u32_t intmask)
+
+static bool power_event_check_and_clean(enum usbd_power_event_type evt, u32_t intmask)
 {
+#if defined(CONFIG_SOC_SERIES_NRF53X)
+	bool ret = nrf_usbreg_event_check(NRF_USBREGULATOR, evt) &&
+			nrf_usbreg_int_enable_check(NRF_USBREGULATOR, intmask);
+
+	if (ret) {
+		nrf_usbreg_event_clear(NRF_USBREGULATOR, evt);
+	}
+
+	return ret;
+#else
 	bool ret = nrf_power_event_check(NRF_POWER, evt) &&
 			nrf_power_int_enable_check(NRF_POWER, intmask);
 
@@ -379,33 +448,39 @@ static bool power_event_check_and_clean(nrf_power_event_t evt, u32_t intmask)
 	}
 
 	return ret;
-}
 #endif
+}
+
+#endif // defined(CONFIG_USB_NRFX)
 
 static void usb_power_isr(void)
 {
 #if defined(CONFIG_USB_NRFX)
-	extern void usb_dc_nrfx_power_event_callback(nrf_power_event_t event);
+	extern void usb_dc_nrfx_power_event_callback(enum usbd_power_event_type event);
 
-	if (power_event_check_and_clean(NRF_POWER_EVENT_USBDETECTED,
-					NRF_POWER_INT_USBDETECTED_MASK)) {
-		usb_dc_nrfx_power_event_callback(NRF_POWER_EVENT_USBDETECTED);
+	if (power_event_check_and_clean(USBD_PWR_EVT_DETECTED,
+					USBD_PWR_INT_DETECTED)) {
+		LOG_ERR("DETECTED");
+		usb_dc_nrfx_power_event_callback(USBD_PWR_EVT_DETECTED);
 	}
 
-	if (power_event_check_and_clean(NRF_POWER_EVENT_USBPWRRDY,
-					NRF_POWER_INT_USBPWRRDY_MASK)) {
-		usb_dc_nrfx_power_event_callback(NRF_POWER_EVENT_USBPWRRDY);
+	if (power_event_check_and_clean(USBD_PWR_EVT_READY,
+					USBD_PWR_INT_READY)) {
+		LOG_ERR("READY");
+		usb_dc_nrfx_power_event_callback(USBD_PWR_EVT_READY);
 	}
 
-	if (power_event_check_and_clean(NRF_POWER_EVENT_USBREMOVED,
-					NRF_POWER_INT_USBREMOVED_MASK)) {
-		usb_dc_nrfx_power_event_callback(NRF_POWER_EVENT_USBREMOVED);
+	if (power_event_check_and_clean(USBD_PWR_EVT_REMOVED,
+					USBD_PWR_INT_REMOVED)) {
+		LOG_ERR("REMOVED");
+		usb_dc_nrfx_power_event_callback(USBD_PWR_EVT_REMOVED);
 	}
 #endif
 }
 
 void nrf_power_clock_isr(void *arg)
 {
+	LOG_ERR("CLK ISR");
 	ARG_UNUSED(arg);
 	struct device *dev = DEVICE_GET(clock_nrf);
 
@@ -439,6 +514,23 @@ void nrf_power_clock_isr(void *arg)
 }
 
 #ifdef CONFIG_USB_NRFX
+#if defined(CONFIG_SOC_SERIES_NRF53X)
+void nrf5_power_usb_power_int_enable(bool enable)
+{
+	u32_t mask;
+
+	mask = NRF_USBREG_INT_USBDETECTED |
+	       NRF_USBREG_INT_USBREMOVED  |
+	       NRF_USBREG_INT_USBPWRRDY;
+
+	if (enable) {
+		nrf_usbreg_int_enable(NRF_USBREGULATOR, mask);
+		irq_enable(55);
+	} else {
+		nrf_usbreg_int_disable(NRF_USBREGULATOR, mask);
+	}
+}
+#else
 void nrf5_power_usb_power_int_enable(bool enable)
 {
 	u32_t mask;
@@ -454,4 +546,5 @@ void nrf5_power_usb_power_int_enable(bool enable)
 		nrf_power_int_disable(NRF_POWER, mask);
 	}
 }
-#endif
+#endif 
+#endif // CONFIG_USB_NRFX
