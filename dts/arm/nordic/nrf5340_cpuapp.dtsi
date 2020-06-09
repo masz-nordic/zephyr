@@ -46,6 +46,7 @@
 		gpio-0 = &gpio0;
 		gpio-1 = &gpio1;
 		gpiote-0 = &gpiote;
+		usbd-0 = &usbd;
 		i2c-0 = &i2c0;
 		i2c-1 = &i2c1;
 		i2c-2 = &i2c2;
@@ -129,6 +130,19 @@
 			compatible = "nordic,nrf-uicr";
 			reg = <0xff8000 0x1000>;
 			status = "okay";
+		};
+
+		usbd: usbd@50036000 {
+			compatible = "nordic,nrf-usbd";
+			reg = <0x50036000 0x1000>;
+			interrupts = <54 1>;
+			num-bidir-endpoints = <1>;
+			num-in-endpoints = <7>;
+			num-out-endpoints = <7>;
+			num-isoin-endpoints = <1>;
+			num-isoout-endpoints = <1>;
+			status = "disabled";
+			label = "USBD";
 		};
 	};
 };
