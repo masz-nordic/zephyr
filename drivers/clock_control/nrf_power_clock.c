@@ -10,7 +10,7 @@
 #include <drivers/clock_control/nrf_clock_control.h>
 #include "nrf_clock_calibration.h"
 #include <logging/log.h>
-#include <nrfx_power_compat.h>
+#include <nrfx_power.h>
 
 LOG_MODULE_REGISTER(clock_control, CONFIG_CLOCK_CONTROL_LOG_LEVEL);
 
@@ -318,7 +318,9 @@ static int clock_start(struct device *dev, clock_control_subsys_t sub_system)
  */
 void nrf_power_clock_isr(void *arg);
 
-static void usb_power_isr(nrfx_usbreg_evt_t evt);
+#if defined(CONFIG_USB_NRFX) && defined(CONFIG_SOC_SERIES_NRF53X)
+static void usb_power_isr(nrfx_power_usb_evt_t evt);
+#endif
 
 static int clk_init(struct device *dev)
 {
@@ -328,15 +330,21 @@ static int clk_init(struct device *dev)
 	irq_enable(DT_INST_IRQN(0));
 
 #if defined(CONFIG_USB_NRFX)
+	//NRF53
+#if defined(CONFIG_SOC_SERIES_NRF53X)
 	IRQ_CONNECT(USBREGULATOR_IRQn, DT_INST_IRQ(0, priority),
-		    nrfx_usbreg_irq_handler, 0, 0);
+		    nrfx_usbreg_irq_handler, 0, 0); //one common handler usbreg & pwrclk?
 	irq_enable(USBREGULATOR_IRQn);
+#endif
+	//NRF52 - connect nrfx_power_clock_irq_handler to 0 and 55
 
+#if defined(CONFIG_SOC_SERIES_NRF53X)
 	nrfx_power_usbevt_config_t power_conf = {
 		.handler = usb_power_isr,
 		.irq_priority = DT_INST_IRQ(0, priority),
 	};
 	nrfx_power_usbevt_init(&power_conf);
+#endif
 #endif
 
 	nrf_clock_lf_src_set(NRF_CLOCK, CLOCK_CONTROL_NRF_K32SRC);
@@ -400,13 +408,46 @@ static void clkstarted_handle(struct device *dev,
 	}
 }
 
+#if defined(CONFIG_USB_NRFX) && !defined(CONFIG_SOC_SERIES_NRF53X)
+static bool power_event_check_and_clean(nrf_power_event_t evt, u32_t intmask)
+{
+	bool ret = nrf_power_event_check(NRF_POWER, evt) &&
+			nrf_power_int_enable_check(NRF_POWER, intmask);
 
-#if defined(CONFIG_USB_NRFX)
-static void usb_power_isr(nrfx_usbreg_evt_t evt)
+	if (ret) {
+		nrf_power_event_clear(NRF_POWER, evt);
+	}
+
+	return ret;
+}
+#endif
+
+#if defined(CONFIG_USB_NRFX) && defined(CONFIG_SOC_SERIES_NRF53X)
+static void usb_power_isr(nrfx_power_usb_evt_t evt)
 {
 	extern void usb_dc_nrfx_power_event_callback(nrfx_power_usb_evt_t event);
 
 	usb_dc_nrfx_power_event_callback(evt);
+}
+#elif defined(CONFIG_USB_NRFX) && !defined(CONFIG_SOC_SERIES_NRF53X)
+static void usb_power_isr(void)	
+{	
+	extern void usb_dc_nrfx_power_event_callback(nrf_power_event_t event);	
+
+	if (power_event_check_and_clean(NRF_POWER_EVENT_USBDETECTED,	
+					NRF_POWER_INT_USBDETECTED_MASK)) {	
+		usb_dc_nrfx_power_event_callback(NRFX_POWER_USB_EVT_DETECTED);	
+	}	
+
+	if (power_event_check_and_clean(NRF_POWER_EVENT_USBPWRRDY,	
+					NRF_POWER_INT_USBPWRRDY_MASK)) {	
+		usb_dc_nrfx_power_event_callback(NRFX_POWER_USB_EVT_READY);	
+	}	
+
+	if (power_event_check_and_clean(NRF_POWER_EVENT_USBREMOVED,	
+					NRF_POWER_INT_USBREMOVED_MASK)) {	
+		usb_dc_nrfx_power_event_callback(NRFX_POWER_USB_EVT_REMOVED);	
+	}	
 }
 #endif
 
@@ -440,6 +481,9 @@ void nrf_power_clock_isr(void *arg)
 	if (IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_RC_CALIBRATION)) {
 		z_nrf_clock_calibration_isr();
 	}
+#if defined(CONFIG_USB_NRFX) && !defined(CONFIG_SOC_SERIES_NRF53X)
+	usb_power_isr();
+#endif
 }
 
 #ifdef CONFIG_USB_NRFX
@@ -447,7 +491,11 @@ void nrf5_power_usb_power_int_enable(bool enable)
 {
 	if (enable) {
 		nrfx_power_usbevt_enable();
+#if defined(CONFIG_SOC_SERIES_NRF53X)
 		irq_enable(USBREGULATOR_IRQn);
+#else
+		irq_enable(DT_INST_IRQN(0));
+#endif
 	} else {
 		nrfx_power_usbevt_disable();
 	}
