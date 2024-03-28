@@ -1,0 +1,37 @@
+/*
+ * Copyright (c) 2024 Nordic Semiconductor
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/ {
+	chosen {
+		zephyr,console = &uart30;
+		zephyr,shell-uart = &uart30;
+		zephyr,uart-mcumgr = &uart30;
+	};
+};
+
+&uart30 {
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&uart30_default>;
+	pinctrl-1 = <&uart30_sleep>;
+	pinctrl-names = "default", "sleep";
+};
+
+/* Enable FLPR. */
+&cpuflpr_vpr {
+	status = "okay";
+};
+
+&cpuflpr_vevif_remote {
+	status = "okay";
+};
+
+&grtc {
+	status = "okay";
+};
+
+&uart20 {
+	status = "reserved";
+};
