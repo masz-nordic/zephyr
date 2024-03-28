@@ -43,7 +43,11 @@
 
 /* clang-format off */
 
-#define RRAM_BASE REG_ADDR_NS(DT_NODELABEL(rram0))
+#ifdef CONFIG_SOC_NRF54L15_CPUFLPR
+#define RRAM_BASE REG_ADDR_NS(DT_NODELABEL(cpuflpr_rram))
+#else
+#define RRAM_BASE REG_ADDR_NS(DT_NODELABEL(cpuapp_rram))
+#endif
 #define RRAM_CONTROLLER DT_NODELABEL(rram_controller)
 
 #if !DT_NODE_EXISTS(RRAM_CONTROLLER)

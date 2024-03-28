@@ -18,11 +18,15 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/cache.h>
 
+#if defined(NRF_APPLICATION)
 #include <cmsis_core.h>
+#endif
 #include <hal/nrf_glitchdet.h>
 #include <hal/nrf_oscillators.h>
 #include <hal/nrf_power.h>
+#if defined(NRF_APPLICATION)
 #include <hal/nrf_regulators.h>
+#endif
 #include <soc/nrfx_coredep.h>
 
 #include <system_nrf54l.h>
@@ -109,6 +113,7 @@ static int nordicsemi_nrf54l_init(void)
 		nrf_power_task_trigger(NRF_POWER, NRF_POWER_TASK_CONSTLAT);
 	}
 
+#if defined(NRF_APPLICATION)
 	if (IS_ENABLED(CONFIG_SOC_NRF54L_VREG_MAIN_DCDC)) {
 		nrf_regulators_vreg_enable_set(NRF_REGULATORS, NRF_REGULATORS_VREG_MAIN, true);
 	}
@@ -116,6 +121,7 @@ static int nordicsemi_nrf54l_init(void)
 	if (IS_ENABLED(CONFIG_SOC_NRF54L_NORMAL_VOLTAGE_MODE)) {
 		nrf_regulators_vreg_enable_set(NRF_REGULATORS, NRF_REGULATORS_VREG_MEDIUM, false);
 	}
+#endif
 
 #if defined(CONFIG_ELV_GRTC_LFXO_ALLOWED)
 	nrf_regulators_elv_mode_allow_set(NRF_REGULATORS, NRF_REGULATORS_ELV_ELVGRTCLFXO_MASK);
