@@ -44,6 +44,7 @@ zephyr_compile_definitions_ifdef(CONFIG_SOC_NRF54H20_CPUPPR     NRF54H20_XXAA
                                                                 NRF_PPR)
 zephyr_compile_definitions_ifdef(CONFIG_SOC_NRF54L15_ENGA       NRF54L15_ENGA_XXAA)
 zephyr_compile_definitions_ifdef(CONFIG_SOC_NRF54L15_ENGA_CPUAPP NRF_APPLICATION)
+zephyr_compile_definitions_ifdef(CONFIG_SOC_NRF54L15_ENGA_CPUFLPR NRF_FLPR)
 zephyr_compile_definitions_ifdef(CONFIG_SOC_NRF9120             NRF9120_XXAA)
 zephyr_compile_definitions_ifdef(CONFIG_SOC_NRF9160             NRF9160_XXAA)
 
@@ -149,7 +150,7 @@ if(DEFINED uicr_path)
   endif()
 endif()
 
-if(CONFIG_SOC_NRF54L15)
+if(CONFIG_SOC_NRF54L15_CPUAPP)
 	dt_prop(clock_frequency PATH "/cpus/cpu@0" PROPERTY "clock-frequency")
 	math(EXPR clock_frequency_mhz "${clock_frequency} / 1000000")
 	zephyr_compile_definitions("NRF_CONFIG_CPU_FREQ_MHZ=${clock_frequency_mhz}")
