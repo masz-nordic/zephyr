@@ -1,6 +1,8 @@
 # Copyright (c) 2024 Nordic Semiconductor ASA
 # SPDX-License-Identifier: Apache-2.0
 
+CONFIG_USE_DT_CODE_PARTITION=y
+
 # Enable MPU
 CONFIG_ARM_MPU=y
 
