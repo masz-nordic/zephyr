@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-&cpuflpr_sram {
-	status = "okay";
-};
+//&cpuflpr_sram {
+//	status = "okay";
+//};
 
 &cpuflpr_vpr {
 	execution-memory = <&cpuflpr_code_partition>;
