@@ -1,0 +1,17 @@
+/*
+ * Copyright (c) 2024 Nordic Semiconductor
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+&cpuflpr_sram {
+	status = "okay";
+};
+
+&cpuflpr_vpr {
+	execution-memory = <&cpuflpr_code_partition>;
+	/delete-property/ source-memory;
+};
+
+&uart20 {
+	status = "reserved";
+};
