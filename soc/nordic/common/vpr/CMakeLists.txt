@@ -3,4 +3,4 @@
 
 zephyr_include_directories(.)
 
-zephyr_library_sources(soc_idle.c soc_irq.S soc_irq.c vector.S)
+zephyr_library_sources(soc_context.S soc_idle.c)
