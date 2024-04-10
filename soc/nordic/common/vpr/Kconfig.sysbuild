@@ -1,0 +1,8 @@
+# Copyright (c) 2024 Nordic Semiconductor ASA
+# SPDX-License-Identifier: Apache-2.0
+
+config VPR_LAUNCHER
+	bool "VPR launcher"
+	depends on SOC_NRF54H20_CPUPPR
+	help
+	  Include VPR launcher hex for application core.
