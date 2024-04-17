@@ -3,6 +3,6 @@
 
 config VPR_LAUNCHER
 	bool "VPR launcher"
-	depends on SOC_NRF54H20_CPUPPR
+	depends on (SOC_NRF54H20_CPUPPR || SOC_NRF54L15_ENGA_CPUFLPR)
 	help
 	  Include VPR launcher hex for application core.
