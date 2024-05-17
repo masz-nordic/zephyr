@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include <zephyr/devicetree.h>
+#include <zephyr/kernel.h>
 #include <zephyr/init.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
@@ -41,14 +42,23 @@ static int nordic_vpr_launcher_init(const struct device *dev)
 	}
 #endif
 
+	while(true)
+	{
 #if defined(CONFIG_SOC_NRF54L15_ENGA_CPUAPP) && !defined(CONFIG_TRUSTED_EXECUTION_NONSECURE)
-	nrf_spu_periph_perm_secattr_set(NRF_SPU00, nrf_address_slave_get((uint32_t)config->vpr),
+		nrf_spu_periph_perm_secattr_set(NRF_SPU00, nrf_address_slave_get((uint32_t)config->vpr),
 					true);
 #endif
-	LOG_DBG("Launching VPR (%p) from %p", config->vpr, (void *)config->exec_addr);
-	nrf_vpr_initpc_set(config->vpr, config->exec_addr);
-	nrf_vpr_cpurun_set(config->vpr, true);
-
+		LOG_DBG("Launching VPR (%p) from %p", config->vpr, (void *)config->exec_addr);
+		nrf_vpr_initpc_set(config->vpr, config->exec_addr);
+		nrf_vpr_cpurun_set(config->vpr, true);
+		k_sleep(K_MSEC(50));
+		nrf_vpr_cpurun_set(config->vpr, false);
+		nrf_vpr_debugif_dmcontrol_set(config->vpr, NRF_VPR_DMCONTROL_DMACTIVE, true);
+		nrf_vpr_debugif_dmcontrol_set(config->vpr, NRF_VPR_DMCONTROL_NDMRESET, true);
+		k_sleep(K_MSEC(5));
+		nrf_vpr_debugif_dmcontrol_set(config->vpr, NRF_VPR_DMCONTROL_DMACTIVE, false);
+		nrf_vpr_debugif_dmcontrol_set(config->vpr, NRF_VPR_DMCONTROL_NDMRESET, false);
+	}
 	return 0;
 }
 
