@@ -55,6 +55,15 @@ nvic: &cpuapp_nvic {};
 		nordic,tasks-mask = <0x0003f800>;
 		status = "disabled";
 	};
+
+	egpio: gpio {
+		compatible = "nordic,nrf-egpio";
+		gpio-controller;
+		#gpio-cells = < 0x2 >;
+		ngpios = < 0x10 >;
+		status = "disabled";
+		port = < 0x2 >;
+	};
 };
 
 &cpuapp_ppb {
