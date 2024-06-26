@@ -19,6 +19,7 @@ config SOC_NRF54L15_ENGA_CPUAPP
 	select CPU_HAS_FPU
 	select HAS_HW_NRF_RADIO_IEEE802154
 	select HAS_POWEROFF
+	select HAS_NRFE
 
 config SOC_NRF54L15_ENGA_CPUFLPR
 	depends on RISCV_CORE_NORDIC_VPR
@@ -75,5 +76,15 @@ config ELV_GRTC_LFXO_ALLOWED
 	  WARNING! This feature is EXPERIMENTAL and may brick your device!
 
 endif # NRF_GRTC_TIMER
+
+# eGPIO initialization depends on IPC initialization which is done at the same init level and
+# has init priority equal to 46.
+if GPIO
+
+config GPIO_INIT_PRIORITY
+	default 48 if GPIO_NRFE
+	default KERNEL_INIT_PRIORITY_DEFAULT
+
+endif # GPIO
 
 endif # SOC_SERIES_NRF54LX
