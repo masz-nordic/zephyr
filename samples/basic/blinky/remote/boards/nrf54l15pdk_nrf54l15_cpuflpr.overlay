@@ -10,11 +10,11 @@
 			#address-cells = <1>;
 			#size-cells = <1>;
 
-			sram_rx: memory@20018000 {
+			sram_tx: memory@20018000 {
 				reg = <0x20018000 0x0800>;
 			};
 
-			sram_tx: memory@20020000 {
+			sram_rx: memory@20020000 {
 				reg = <0x20020000 0x0800>;
 			};
 		};
@@ -25,28 +25,19 @@
 			compatible = "zephyr,ipc-icmsg";
 			tx-region = <&sram_tx>;
 			rx-region = <&sram_rx>;
-			mboxes = <&cpuapp_vevif_rx 15>, <&cpuapp_vevif_tx 16>;
+			mboxes = <&cpuflpr_vevif_rx 16>, <&cpuflpr_vevif_tx 15>;
 			mbox-names = "rx", "tx";
 			status = "okay";
 		};
 	};
 };
 
-&cpuapp_vevif_rx {
+&cpuflpr_vevif_rx {
 	status = "okay";
 };
 
-&cpuapp_vevif_tx {
+&cpuflpr_vevif_tx {
 	status = "okay";
-};
-
-&egpio {
-	gpio-reserved-ranges = <0 6>, <8 4>;
-	status = "okay";
-};
-
-&led0 {
-	gpios = <&egpio 7 GPIO_ACTIVE_HIGH>;
 };
 
 &gpio0 {
@@ -66,5 +57,21 @@
 };
 
 &gpiote30 {
+	status = "disabled";
+};
+
+&grtc {
+	status = "disabled";
+};
+
+&uart20 {
+	status = "disabled";
+};
+
+&uart30 {
+	status = "disabled";
+};
+
+&pwm20 {
 	status = "disabled";
 };
