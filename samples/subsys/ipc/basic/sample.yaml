@@ -1,0 +1,20 @@
+sample:
+  name: Basic cores communication (structure)
+tests:
+  sample.cores_communication:
+    platform_allow: nrf54l15pdk/nrf54l15/cpuapp
+    integration_platforms:
+      - nrf54l15pdk/nrf54l15/cpuapp
+    tags: ipc
+    extra_args:
+      basic_SNIPPET=nordic-flpr
+    sysbuild: true
+    harness: console
+    harness_config:
+      type: multi_line
+      ordered: false
+      regex:
+        - "No data from remote"
+        - "Sent 14 bytes to host"
+        - "Read 14 bytes from remote, received 14"
+        - "Basic core-communication HOST demo ended"
