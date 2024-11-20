@@ -983,4 +983,11 @@
 #endif
 #endif /* DT_HAS_COMPAT_STATUS_OKAY(nordic_nrf_dppic_global) || ... */
 
+/*
+ * Workaround for undeclared define in nrfx_power_clock.h
+ * This is not used in Zephyr anyway, so define to whatever.
+ */
+#define NRFX_CLOCK_DEFAULT_CONFIG_IRQ_PRIORITY 0
+#define NRFX_POWER_DEFAULT_CONFIG_IRQ_PRIORITY 0
+
 #endif // NRFX_KCONFIG_H__
