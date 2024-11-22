@@ -87,635 +87,77 @@
 #endif
 #endif /* CONFIG_NRF_802154_RADIO_DRIVER */
 
-#ifndef NRFX_DPPI0_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI0_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI0_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI0_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI0_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI0_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI0_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI0_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI0_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI0_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI0_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI0_GROUPS_USED_BY_MPSL 0
-#endif
+#define VALUE_OR_ZERO(x) \
+	COND_CODE_0(IS_EMPTY(x), x, (0))
 
-#ifndef NRFX_DPPI00_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI00_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI00_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI00_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI00_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI00_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI00_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI00_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI00_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI00_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI00_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI00_GROUPS_USED_BY_MPSL 0
-#endif
+#define COMMON_MASKS(peripheral, type) \
+	(VALUE_OR_ZERO(NRFX_##peripheral##_##type##_USED_BY_BT_CTLR) | \
+	 VALUE_OR_ZERO(NRFX_##peripheral##_##type##_USED_BY_802154_DRV) | \
+	 VALUE_OR_ZERO(NRFX_##peripheral##_##type##_USED_BY_MPSL))
 
-#ifndef NRFX_DPPI10_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI10_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI10_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI10_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI10_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI10_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI10_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI10_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI10_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI10_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI10_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI10_GROUPS_USED_BY_MPSL 0
-#endif
+#define PPI_CHANNELS_MASKS()              COMMON_MASKS(PPI, CHANNELS)
+#define PPI_GROUPS_MASKS()                COMMON_MASKS(PPI, GROUPS)
+#define DPPI_CHANNELS_MASKS(inst)         COMMON_MASKS(DPPI##inst, CHANNELS)
+#define DPPI_GROUPS_MASKS(inst)           COMMON_MASKS(DPPI#inst, GROUPS)
+#define PPIB_CHANNELS_MASKS(insta, instb) COMMON_MASKS(PPIB_##insta##_##instb, CHANNELS)
 
-#ifndef NRFX_DPPI20_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI20_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI20_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI20_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI20_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI20_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI20_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI20_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI20_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI20_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI20_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI20_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_PPI_CHANNELS_USED PPI_CHANNELS_MASKS()
+#define NRFX_PPI_GROUPS_USED   PPI_GROUPS_MASKS()
 
-#ifndef NRFX_DPPI30_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI30_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI30_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI30_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI30_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI30_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI30_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI30_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI30_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI30_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI30_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI30_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_DPPI0_CHANNELS_USED DPPI_CHANNELS_MASKS(0)
+#define NRFX_DPPI0_GROUPS_USED   DPPI_GROUPS_MASKS(0)
 
-#ifndef NRFX_DPPI020_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI020_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI020_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI020_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI020_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI020_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI020_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI020_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI020_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI020_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI020_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI020_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_DPPI00_CHANNELS_USED DPPI_CHANNELS_MASKS(00)
+#define NRFX_DPPI00_GROUPS_USED   DPPI_GROUPS_MASKS(00)
 
-#ifndef NRFX_DPPI030_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI030_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI030_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI030_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI030_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI030_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI030_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI030_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI030_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI030_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI030_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI030_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_DPPI10_CHANNELS_USED DPPI_CHANNELS_MASKS(10)
+#define NRFX_DPPI10_GROUPS_USED   DPPI_GROUPS_MASKS(10)
 
-#ifndef NRFX_DPPI120_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI120_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI120_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI120_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI120_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI120_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI120_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI120_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI120_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI120_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI120_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI120_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_DPPI20_CHANNELS_USED DPPI_CHANNELS_MASKS(20)
+#define NRFX_DPPI20_GROUPS_USED   DPPI_GROUPS_MASKS(20)
 
-#ifndef NRFX_DPPI130_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI130_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI130_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI130_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI130_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI130_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI130_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI130_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI130_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI130_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI130_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI130_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_DPPI30_CHANNELS_USED DPPI_CHANNELS_MASKS(30)
+#define NRFX_DPPI30_GROUPS_USED   DPPI_GROUPS_MASKS(30)
 
-#ifndef NRFX_DPPI131_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI131_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI131_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI131_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI131_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI131_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI131_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI131_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI131_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI131_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI131_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI131_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_DPPI020_CHANNELS_USED DPPI_CHANNELS_MASKS(020)
+#define NRFX_DPPI020_GROUPS_USED   DPPI_GROUPS_MASKS(020)
 
-#ifndef NRFX_DPPI132_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI132_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI132_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI132_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI132_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI132_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI132_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI132_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI132_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI132_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI132_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI132_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_DPPI030_CHANNELS_USED DPPI_CHANNELS_MASKS(030)
+#define NRFX_DPPI030_GROUPS_USED   DPPI_GROUPS_MASKS(030)
 
-#ifndef NRFX_DPPI133_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI133_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI133_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI133_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI133_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI133_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI133_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI133_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI133_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI133_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI133_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI133_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_DPPI120_CHANNELS_USED DPPI_CHANNELS_MASKS(120)
+#define NRFX_DPPI120_GROUPS_USED   DPPI_GROUPS_MASKS(120)
 
-#ifndef NRFX_DPPI134_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI134_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI134_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI134_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI134_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI134_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI134_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI134_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI134_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI134_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI134_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI134_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_DPPI130_CHANNELS_USED DPPI_CHANNELS_MASKS(130)
+#define NRFX_DPPI130_GROUPS_USED   DPPI_GROUPS_MASKS(130)
 
-#ifndef NRFX_DPPI135_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI135_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI135_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI135_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI135_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI135_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI135_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI135_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI135_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI135_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI135_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI135_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_DPPI131_CHANNELS_USED DPPI_CHANNELS_MASKS(131)
+#define NRFX_DPPI131_GROUPS_USED   DPPI_GROUPS_MASKS(131)
 
-#ifndef NRFX_DPPI136_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_DPPI136_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI136_GROUPS_USED_BY_BT_CTLR
-#define NRFX_DPPI136_GROUPS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_DPPI136_CHANNELS_USED_BY_802154_DRV
-#define NRFX_DPPI136_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI136_GROUPS_USED_BY_802154_DRV
-#define NRFX_DPPI136_GROUPS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_DPPI136_CHANNELS_USED_BY_MPSL
-#define NRFX_DPPI136_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_DPPI136_GROUPS_USED_BY_MPSL
-#define NRFX_DPPI136_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_DPPI132_CHANNELS_USED DPPI_CHANNELS_MASKS(132)
+#define NRFX_DPPI132_GROUPS_USED   DPPI_GROUPS_MASKS(132)
 
-#ifndef NRFX_PPI_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_PPI_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_PPI_GROUPS_USED_BY_BT_CTLR
-#define NRFX_PPI_GROUPS_USED_BY_BT_CTLR 0
-#endif
+#define NRFX_DPPI133_CHANNELS_USED DPPI_CHANNELS_MASKS(133)
+#define NRFX_DPPI133_GROUPS_USED   DPPI_GROUPS_MASKS(133)
 
-#ifndef NRFX_PPI_CHANNELS_USED_BY_802154_DRV
-#define NRFX_PPI_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_PPI_GROUPS_USED_BY_802154_DRV
-#define NRFX_PPI_GROUPS_USED_BY_802154_DRV 0
-#endif
+#define NRFX_DPPI134_CHANNELS_USED DPPI_CHANNELS_MASKS(134)
+#define NRFX_DPPI134_GROUPS_USED   DPPI_GROUPS_MASKS(134)
 
-#ifndef NRFX_PPI_CHANNELS_USED_BY_MPSL
-#define NRFX_PPI_CHANNELS_USED_BY_MPSL 0
-#endif
-#ifndef NRFX_PPI_GROUPS_USED_BY_MPSL
-#define NRFX_PPI_GROUPS_USED_BY_MPSL 0
-#endif
+#define NRFX_DPPI135_CHANNELS_USED DPPI_CHANNELS_MASKS(135)
+#define NRFX_DPPI135_GROUPS_USED   DPPI_GROUPS_MASKS(135)
 
-#ifndef NRFX_PPIB_00_10_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_PPIB_00_10_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_PPIB_00_10_CHANNELS_USED_BY_802154_DRV
-#define NRFX_PPIB_00_10_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_PPIB_00_10_CHANNELS_USED_BY_MPSL
-#define NRFX_PPIB_00_10_CHANNELS_USED_BY_MPSL 0
-#endif
-
-#ifndef NRFX_PPIB_01_20_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_PPIB_01_20_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_PPIB_01_20_CHANNELS_USED_BY_802154_DRV
-#define NRFX_PPIB_01_20_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_PPIB_01_20_CHANNELS_USED_BY_MPSL
-#define NRFX_PPIB_01_20_CHANNELS_USED_BY_MPSL 0
-#endif
-
-#ifndef NRFX_PPIB_11_21_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_PPIB_11_21_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_PPIB_11_21_CHANNELS_USED_BY_802154_DRV
-#define NRFX_PPIB_11_21_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_PPIB_11_21_CHANNELS_USED_BY_MPSL
-#define NRFX_PPIB_11_21_CHANNELS_USED_BY_MPSL 0
-#endif
-
-#ifndef NRFX_PPIB_22_30_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_PPIB_22_30_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_PPIB_22_30_CHANNELS_USED_BY_802154_DRV
-#define NRFX_PPIB_22_30_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_PPIB_22_30_CHANNELS_USED_BY_MPSL
-#define NRFX_PPIB_22_30_CHANNELS_USED_BY_MPSL 0
-#endif
-
-#ifndef NRFX_PPIB_02_03_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_PPIB_02_03_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_PPIB_02_03_CHANNELS_USED_BY_802154_DRV
-#define NRFX_PPIB_02_03_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_PPIB_02_03_CHANNELS_USED_BY_MPSL
-#define NRFX_PPIB_02_03_CHANNELS_USED_BY_MPSL 0
-#endif
-
-#ifndef NRFX_PPIB_04_12_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_PPIB_04_12_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_PPIB_04_12_CHANNELS_USED_BY_802154_DRV
-#define NRFX_PPIB_04_12_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_PPIB_04_12_CHANNELS_USED_BY_MPSL
-#define NRFX_PPIB_04_12_CHANNELS_USED_BY_MPSL 0
-#endif
-
-#ifndef NRFX_PPIB_020_030_CHANNELS_USED_BY_BT_CTLR
-#define NRFX_PPIB_020_030_CHANNELS_USED_BY_BT_CTLR 0
-#endif
-#ifndef NRFX_PPIB_020_030_CHANNELS_USED_BY_802154_DRV
-#define NRFX_PPIB_020_030_CHANNELS_USED_BY_802154_DRV 0
-#endif
-#ifndef NRFX_PPIB_020_030_CHANNELS_USED_BY_MPSL
-#define NRFX_PPIB_020_030_CHANNELS_USED_BY_MPSL 0
-#endif
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI0_CHANNELS_USED                                                                   \
-	(NRFX_DPPI0_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI0_CHANNELS_USED_BY_802154_DRV |            \
-	 NRFX_DPPI0_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI0_GROUPS_USED                                                                     \
-	(NRFX_DPPI0_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI0_GROUPS_USED_BY_802154_DRV |                \
-	 NRFX_DPPI0_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI00_CHANNELS_USED                                                                  \
-	(NRFX_DPPI00_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI00_CHANNELS_USED_BY_802154_DRV |          \
-	 NRFX_DPPI00_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI00_GROUPS_USED                                                                    \
-	(NRFX_DPPI00_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI00_GROUPS_USED_BY_802154_DRV |              \
-	 NRFX_DPPI00_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI10_CHANNELS_USED                                                                  \
-	(NRFX_DPPI10_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI10_CHANNELS_USED_BY_802154_DRV |          \
-	 NRFX_DPPI10_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI10_GROUPS_USED                                                                    \
-	(NRFX_DPPI10_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI10_GROUPS_USED_BY_802154_DRV |              \
-	 NRFX_DPPI10_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI20_CHANNELS_USED                                                                  \
-	(NRFX_DPPI20_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI20_CHANNELS_USED_BY_802154_DRV |          \
-	 NRFX_DPPI20_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI20_GROUPS_USED                                                                    \
-	(NRFX_DPPI20_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI20_GROUPS_USED_BY_802154_DRV |              \
-	 NRFX_DPPI20_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI30_CHANNELS_USED                                                                  \
-	(NRFX_DPPI30_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI30_CHANNELS_USED_BY_802154_DRV |          \
-	 NRFX_DPPI30_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI30_GROUPS_USED                                                                    \
-	(NRFX_DPPI30_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI30_GROUPS_USED_BY_802154_DRV |              \
-	 NRFX_DPPI30_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI020_CHANNELS_USED                                                                 \
-	(NRFX_DPPI020_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI020_CHANNELS_USED_BY_802154_DRV |        \
-	 NRFX_DPPI020_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI020_GROUPS_USED                                                                   \
-	(NRFX_DPPI020_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI020_GROUPS_USED_BY_802154_DRV |            \
-	 NRFX_DPPI020_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI030_CHANNELS_USED                                                                 \
-	(NRFX_DPPI030_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI030_CHANNELS_USED_BY_802154_DRV |        \
-	 NRFX_DPPI030_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI030_GROUPS_USED                                                                   \
-	(NRFX_DPPI030_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI030_GROUPS_USED_BY_802154_DRV |            \
-	 NRFX_DPPI030_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI120_CHANNELS_USED                                                                 \
-	(NRFX_DPPI120_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI120_CHANNELS_USED_BY_802154_DRV |        \
-	 NRFX_DPPI120_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI120_GROUPS_USED                                                                   \
-	(NRFX_DPPI120_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI120_GROUPS_USED_BY_802154_DRV |            \
-	 NRFX_DPPI120_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI130_CHANNELS_USED                                                                 \
-	(NRFX_DPPI130_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI130_CHANNELS_USED_BY_802154_DRV |        \
-	 NRFX_DPPI130_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI130_GROUPS_USED                                                                   \
-	(NRFX_DPPI130_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI130_GROUPS_USED_BY_802154_DRV |            \
-	 NRFX_DPPI130_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI131_CHANNELS_USED                                                                 \
-	(NRFX_DPPI131_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI131_CHANNELS_USED_BY_802154_DRV |        \
-	 NRFX_DPPI131_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI131_GROUPS_USED                                                                   \
-	(NRFX_DPPI131_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI131_GROUPS_USED_BY_802154_DRV |            \
-	 NRFX_DPPI131_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI132_CHANNELS_USED                                                                 \
-	(NRFX_DPPI132_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI132_CHANNELS_USED_BY_802154_DRV |        \
-	 NRFX_DPPI132_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI132_GROUPS_USED                                                                   \
-	(NRFX_DPPI132_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI132_GROUPS_USED_BY_802154_DRV |            \
-	 NRFX_DPPI132_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI133_CHANNELS_USED                                                                 \
-	(NRFX_DPPI133_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI133_CHANNELS_USED_BY_802154_DRV |        \
-	 NRFX_DPPI133_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI133_GROUPS_USED                                                                   \
-	(NRFX_DPPI133_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI133_GROUPS_USED_BY_802154_DRV |            \
-	 NRFX_DPPI133_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI134_CHANNELS_USED                                                                 \
-	(NRFX_DPPI134_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI134_CHANNELS_USED_BY_802154_DRV |        \
-	 NRFX_DPPI134_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI134_GROUPS_USED                                                                   \
-	(NRFX_DPPI134_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI134_GROUPS_USED_BY_802154_DRV |            \
-	 NRFX_DPPI134_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI135_CHANNELS_USED                                                                 \
-	(NRFX_DPPI135_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI135_CHANNELS_USED_BY_802154_DRV |        \
-	 NRFX_DPPI135_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI135_GROUPS_USED                                                                   \
-	(NRFX_DPPI135_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI135_GROUPS_USED_BY_802154_DRV |            \
-	 NRFX_DPPI135_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI136_CHANNELS_USED                                                                 \
-	(NRFX_DPPI136_CHANNELS_USED_BY_BT_CTLR | NRFX_DPPI136_CHANNELS_USED_BY_802154_DRV |        \
-	 NRFX_DPPI136_CHANNELS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_DPPI136_GROUPS_USED                                                                   \
-	(NRFX_DPPI136_GROUPS_USED_BY_BT_CTLR | NRFX_DPPI136_GROUPS_USED_BY_802154_DRV |            \
-	 NRFX_DPPI136_GROUPS_USED_BY_MPSL)
-
-/** @brief Bitmask that defines PPI channels that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_PPI_CHANNELS_USED                                                                     \
-	(NRFX_PPI_CHANNELS_USED_BY_BT_CTLR | NRFX_PPI_CHANNELS_USED_BY_802154_DRV |                \
-	 NRFX_PPI_CHANNELS_USED_BY_MPSL)
+#define NRFX_DPPI136_CHANNELS_USED DPPI_CHANNELS_MASKS(136)
+#define NRFX_DPPI136_GROUPS_USED   DPPI_GROUPS_MASKS(136)
 
 #define NRFX_DPPI_CHANNELS_USED NRFX_DPPI0_CHANNELS_USED
 #define NRFX_DPPI_GROUPS_USED   NRFX_DPPI0_GROUPS_USED
 
-/** @brief Bitmask that defines PPI groups that are reserved for use outside
- *         of the nrfx library.
- */
-#define NRFX_PPI_GROUPS_USED                                                                       \
-	(NRFX_PPI_GROUPS_USED_BY_BT_CTLR | NRFX_PPI_GROUPS_USED_BY_802154_DRV |                    \
-	 NRFX_PPI_GROUPS_USED_BY_MPSL)
-
-#define NRFX_PPIB_INTERCONNECT_00_10_CHANNELS_USED                                                 \
-	(NRFX_PPIB_00_10_CHANNELS_USED_BY_BT_CTLR | NRFX_PPIB_00_10_CHANNELS_USED_BY_802154_DRV |  \
-	 NRFX_PPIB_00_10_CHANNELS_USED_BY_MPSL)
-
-#define NRFX_PPIB_INTERCONNECT_01_20_CHANNELS_USED                                                 \
-	(NRFX_PPIB_01_20_CHANNELS_USED_BY_BT_CTLR | NRFX_PPIB_01_20_CHANNELS_USED_BY_802154_DRV |  \
-	 NRFX_PPIB_01_20_CHANNELS_USED_BY_MPSL)
-
-#define NRFX_PPIB_INTERCONNECT_11_21_CHANNELS_USED                                                 \
-	(NRFX_PPIB_11_21_CHANNELS_USED_BY_BT_CTLR | NRFX_PPIB_11_21_CHANNELS_USED_BY_802154_DRV |  \
-	 NRFX_PPIB_11_21_CHANNELS_USED_BY_MPSL)
-
-#define NRFX_PPIB_INTERCONNECT_22_30_CHANNELS_USED                                                 \
-	(NRFX_PPIB_22_30_CHANNELS_USED_BY_BT_CTLR | NRFX_PPIB_22_30_CHANNELS_USED_BY_802154_DRV |  \
-	 NRFX_PPIB_22_30_CHANNELS_USED_BY_MPSL)
-
-#define NRFX_PPIB_INTERCONNECT_02_03_CHANNELS_USED                                                 \
-	(NRFX_PPIB_02_03_CHANNELS_USED_BY_BT_CTLR | NRFX_PPIB_02_03_CHANNELS_USED_BY_802154_DRV |  \
-	 NRFX_PPIB_02_03_CHANNELS_USED_BY_MPSL)
-
-#define NRFX_PPIB_INTERCONNECT_04_12_CHANNELS_USED                                                 \
-	(NRFX_PPIB_04_12_CHANNELS_USED_BY_BT_CTLR | NRFX_PPIB_04_12_CHANNELS_USED_BY_802154_DRV |  \
-	 NRFX_PPIB_04_12_CHANNELS_USED_BY_MPSL)
-
-#define NRFX_PPIB_INTERCONNECT_020_030_CHANNELS_USED                                               \
-	(NRFX_PPIB_020_030_CHANNELS_USED_BY_BT_CTLR |                                              \
-	 NRFX_PPIB_020_030_CHANNELS_USED_BY_802154_DRV | NRFX_PPIB_020_030_CHANNELS_USED_BY_MPSL)
+#define NRFX_PPIB_INTERCONNECT_00_10_CHANNELS_USED  PPIB_CHANNELS_MASKS(00, 10)
+#define NRFX_PPIB_INTERCONNECT_01_20_CHANNELS_USED  PPIB_CHANNELS_MASKS(01, 20)
+#define NRFX_PPIB_INTERCONNECT_11_21_CHANNELS_USED  PPIB_CHANNELS_MASKS(11, 21)
+#define NRFX_PPIB_INTERCONNECT_22_30_CHANNELS_USED  PPIB_CHANNELS_MASKS(22, 30)
+#define NRFX_PPIB_INTERCONNECT_02_03_CHANNELS_USED  PPIB_CHANNELS_MASKS(02, 03)
+#define NRFX_PPIB_INTERCONNECT_04_12_CHANNELS_USED  PPIB_CHANNELS_MASKS(04, 12)
+#define NRFX_PPIB_INTERCONNECT_020_030_CHANNELS_USED PPIB_CHANNELS_MASKS(020, 030)
 
 #endif /* NRFX_RESERVED_RESOURCES_H__ */
