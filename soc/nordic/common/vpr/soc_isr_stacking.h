@@ -107,6 +107,26 @@
 	or t2, t1, t0;						\
 	sr t2, __struct_arch_esf_mepc_OFFSET(sp)
 
+/*
+ * Workaround for Haltium errata 34 and 93:
+ * Check if mem[MEPC] == WFI (it can be 2B aligned, so use lh).
+ * Remove LSB from MEPC since it indicates if HW offset
+ * was applied.
+ * If true, update MEPC =+ 4 so the WFI is skipped.
+ */
+#define WORKAROUND_WFI_MEPC				\
+	lr t0, __struct_arch_esf_mepc_OFFSET(sp);	\
+	andi t0, t0, 0xFFFFFFFE;			\
+	lh t1, 0(t0);					\
+	lh t2, 2(t0);					\
+	li a0, 0x0073;					\
+	bne t1, a0, not_wfi;				\
+	li a0, 0x1050;					\
+	bne t2, a0, not_wfi;				\
+	addi t0, t0, 4;					\
+	sr t0, __struct_arch_esf_mepc_OFFSET(sp);	\
+not_wfi:
+
 #define SOC_ISR_SW_STACKING			\
 	csrw mscratch, t0;			\
 						\
@@ -122,6 +142,7 @@
 						\
 stacking_is_interrupt:				\
 	addi sp, sp, -ESF_SW_IRQ_SIZEOF;	\
+	WORKAROUND_WFI_MEPC			\
 						\
 stacking_keep_going:				\
 	STORE_SP_ALIGN_BIT_FROM_MEPC
