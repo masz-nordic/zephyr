@@ -11,11 +11,14 @@ endif()
 
 set(INC_DIR ${NRFX_DIR}/drivers/include)
 set(SRC_DIR ${NRFX_DIR}/drivers/src)
-set(MDK_DIR ${NRFX_DIR}/mdk)
+set(BSP_DIR ${NRFX_DIR}/bsp)
 set(HELPERS_DIR ${NRFX_DIR}/helpers)
+
+set(MDK_DIR ${NRFX_DIR}/bsp/${CONFIG_SOC_NORDIC_BSP_PATH}/mdk)
 
 zephyr_include_directories(${NRFX_DIR})
 zephyr_include_directories(${INC_DIR})
+zephyr_include_directories(${BSP_DIR})
 zephyr_include_directories(${MDK_DIR})
 zephyr_include_directories(.)
 

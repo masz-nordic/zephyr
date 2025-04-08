@@ -14,6 +14,10 @@
  * supported by nrfx (see the corresponding nrfx_config_*.h files).
  */
 
+#ifdef CONFIG_SOC_NORDIC_BSP_PATH
+#define NRFX_BSP_NRF_PATH CONFIG_SOC_NORDIC_BSP_NRF_PATH
+#endif
+
 #ifdef CONFIG_NRFX_ADC
 #define NRFX_ADC_ENABLED 1
 #endif
