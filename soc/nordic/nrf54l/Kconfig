@@ -55,6 +55,14 @@ config SOC_NRF54L20_ENGA_CPUFLPR
 
 if SOC_SERIES_NRF54LX
 
+config SOC_NORDIC_BSP_PATH
+	string
+	default "lumos"
+
+config SOC_NORDIC_BSP_NRF_PATH
+	string
+	default "lumos/mdk/nrf.h"
+
 config SOC_NRF54LX_SKIP_CLOCK_CONFIG
 	bool "Skip clock frequency configuration in system initialization"
 	help
