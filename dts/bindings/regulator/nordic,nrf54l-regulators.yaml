@@ -3,7 +3,6 @@
 
 description: Nordic REGULATORS (voltage regulators control module) on nRF54L.
 
-compatible: "nordic,nrf54l-regulators"
 
 include: base.yaml
 

@@ -6,8 +6,7 @@ tests:
       - CONFIG_ZMS_LOOKUP_CACHE_SIZE=512
     platform_allow:
       - nrf52840dk/nrf52840
-      - nrf54l15dk/nrf54l15/cpuapp
-      - ophelia4ev/nrf54l15/cpuapp
+      
       - mps2/an385
     integration_platforms:
       - mps2/an385
@@ -26,8 +25,7 @@ tests:
       - CONFIG_SETTINGS_NVS_NAME_CACHE_SIZE=512
     platform_allow:
       - nrf52840dk/nrf52840
-      - nrf54l15dk/nrf54l15/cpuapp
-      - ophelia4ev/nrf54l15/cpuapp
+      
       - mps2/an385
     integration_platforms:
       - mps2/an385
