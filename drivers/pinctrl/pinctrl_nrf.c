@@ -17,11 +17,12 @@ BUILD_ASSERT(((NRF_PULL_NONE == NRF_GPIO_PIN_NOPULL) &&
 	      (NRF_PULL_UP == NRF_GPIO_PIN_PULLUP)),
 	      "nRF pinctrl pull settings do not match HAL values");
 
-#if defined(GPIO_PIN_CNF_DRIVE_E0E1) || defined(GPIO_PIN_CNF_DRIVE0_E0)
+#if NRF_GPIO_HAS_DRIVE_EXTRA
 #define NRF_DRIVE_COUNT (NRF_DRIVE_E0E1 + 1)
 #else
 #define NRF_DRIVE_COUNT (NRF_DRIVE_H0D1 + 1)
 #endif
+
 static const nrf_gpio_pin_drive_t drive_modes[NRF_DRIVE_COUNT] = {
 	[NRF_DRIVE_S0S1] = NRF_GPIO_PIN_S0S1,
 	[NRF_DRIVE_H0S1] = NRF_GPIO_PIN_H0S1,
@@ -31,7 +32,7 @@ static const nrf_gpio_pin_drive_t drive_modes[NRF_DRIVE_COUNT] = {
 	[NRF_DRIVE_D0H1] = NRF_GPIO_PIN_D0H1,
 	[NRF_DRIVE_S0D1] = NRF_GPIO_PIN_S0D1,
 	[NRF_DRIVE_H0D1] = NRF_GPIO_PIN_H0D1,
-#if defined(GPIO_PIN_CNF_DRIVE_E0E1) || defined(GPIO_PIN_CNF_DRIVE0_E0)
+#if NRF_GPIO_HAS_DRIVE_EXTRA
 	[NRF_DRIVE_E0E1] = NRF_GPIO_PIN_E0E1,
 #endif
 };
@@ -575,9 +576,9 @@ static bool nrf_pinctrl_grtc(struct nrf_pinctrl_pin *pin)
 	switch(pin->fun) {
 #if DT_NODE_HAS_PROP(DT_NODELABEL(grtc), clkout_fast_frequency_hz)
 		case NRF_FUN_GRTC_CLKOUT_FAST:
-#if NRF_GPIO_HAS_SEL && defined(GPIO_PIN_CNF_CTRLSEL_GRTC)
+#if NRF_GPIO_HAS_CTRLSEL_GRTC
 			nrf_gpio_pin_control_select(pin->psel, NRF_GPIO_PIN_SEL_GRTC);
-#endif /* NRF_GPIO_HAS_SEL && defined(GPIO_PIN_CNF_CTRLSEL_GRTC) */
+#endif /* NRF_GPIO_HAS_CTRLSEL_GRTC */
 			pin->dir = NRF_GPIO_PIN_DIR_OUTPUT;
 			pin->input = NRF_GPIO_PIN_INPUT_DISCONNECT;
 			return true;
@@ -585,9 +586,9 @@ static bool nrf_pinctrl_grtc(struct nrf_pinctrl_pin *pin)
 
 #if DT_NODE_HAS_PROP(DT_NODELABEL(grtc), clkout_32k)
 		case NRF_FUN_GRTC_CLKOUT_32K:
-#if NRF_GPIO_HAS_SEL && defined(GPIO_PIN_CNF_CTRLSEL_GRTC)
+#if NRF_GPIO_HAS_CTRLSEL_GRTC
 			nrf_gpio_pin_control_select(pin->psel, NRF_GPIO_PIN_SEL_GRTC);
-#endif /* NRF_GPIO_HAS_SEL && defined(GPIO_PIN_CNF_CTRLSEL_GRTC) */
+#endif /* NRF_GPIO_HAS_CTRLSEL_GRTC */
 			pin->dir = NRF_GPIO_PIN_DIR_OUTPUT;
 			pin->input = NRF_GPIO_PIN_INPUT_DISCONNECT;
 			return true;
