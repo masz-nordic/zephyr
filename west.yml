@@ -207,7 +207,7 @@ manifest:
       remote: nrfconnect
       repo-path: nrfx
       path: modules/hal/nordic/nrfx
-      revision: nrfx_ag
+      revision: masz_pdm
       groups:
         - hal
     - name: hal_nordic_bsp_stable
@@ -221,7 +221,7 @@ manifest:
       remote: nrfconnect
       repo-path: nrfx
       path: modules/hal/nordic/nrfx/bsp/lumos
-      revision: lumos_zephyr
+      revision: NRFX-7333
       groups:
         - hal
     - name: hal_nuvoton
