@@ -16,7 +16,7 @@
 #ifdef CONFIG_SOC_NRF54H20_GPD
 #include <nrf/gpd.h>
 #endif
-#ifdef CONFIG_SOC_NRF52832_ALLOW_SPIM_DESPITE_PAN_58
+#ifdef CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE
 #include <nrfx_ppi.h>
 #endif
 #ifdef CONFIG_SOC_NRF5340_CPUAPP
@@ -33,10 +33,9 @@ LOG_MODULE_REGISTER(spi_nrfx_spim, CONFIG_SPI_LOG_LEVEL);
 #include "spi_context.h"
 #include "spi_nrfx_common.h"
 
-#if defined(CONFIG_SOC_NRF52832) && !defined(CONFIG_SOC_NRF52832_ALLOW_SPIM_DESPITE_PAN_58)
-#error  This driver is not available by default for nRF52832 because of Product Anomaly 58 \
-	(SPIM: An additional byte is clocked out when RXD.MAXCNT == 1 and TXD.MAXCNT <= 1). \
-	Use CONFIG_SOC_NRF52832_ALLOW_SPIM_DESPITE_PAN_58=y to override this limitation.
+#if defined(CONFIG_NORDIC_AFFECTED_SPIM_ADDITIONA_BYTE) && !defined(CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE)
+#error  This driver is not available by default for SoCs affected by SPIM: An additional byte is clocked out when RXD.MAXCNT == 1 and TXD.MAXCNT <= 1). \
+	Use CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE=y to override this limitation.
 #endif
 
 #if (CONFIG_SPI_NRFX_RAM_BUFFER_SIZE > 0)
@@ -63,8 +62,8 @@ struct spi_nrfx_data {
 	uint8_t *tx_buffer;
 	uint8_t *rx_buffer;
 #endif
-#ifdef CONFIG_SOC_NRF52832_ALLOW_SPIM_DESPITE_PAN_58
-	bool    anomaly_58_workaround_active;
+#ifdef CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE
+	bool    additional_byte_workaround_active;
 	uint8_t ppi_ch;
 	uint8_t gpiote_ch;
 #endif
@@ -80,8 +79,8 @@ struct spi_nrfx_config {
 	void (*irq_connect)(void);
 	uint16_t max_chunk_len;
 	const struct pinctrl_dev_config *pcfg;
-#ifdef CONFIG_SOC_NRF52832_ALLOW_SPIM_DESPITE_PAN_58
-	bool anomaly_58_workaround;
+#ifdef CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE
+	bool additional_byte_workaround;
 #endif
 	uint32_t wake_pin;
 	nrfx_gpiote_t wake_gpiote;
@@ -304,7 +303,7 @@ static int configure(const struct device *dev,
 	return 0;
 }
 
-#ifdef CONFIG_SOC_NRF52832_ALLOW_SPIM_DESPITE_PAN_58
+#ifdef CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE
 static const nrfx_gpiote_t gpiote = NRFX_GPIOTE_INSTANCE(0);
 
 /*
@@ -319,7 +318,7 @@ static const nrfx_gpiote_t gpiote = NRFX_GPIOTE_INSTANCE(0);
  * channel and the GPIOTE channel before attempting to transmit multiple
  * bytes.
  */
-static void anomaly_58_workaround_setup(const struct device *dev)
+static void additional_byte_workaround_setup(const struct device *dev)
 {
 	struct spi_nrfx_data *dev_data = dev->data;
 	const struct spi_nrfx_config *dev_config = dev->config;
@@ -329,7 +328,7 @@ static void anomaly_58_workaround_setup(const struct device *dev)
 	uint32_t eep = (uint32_t)&gpiote.p_reg->EVENTS_IN[gpiote_ch];
 	uint32_t tep = (uint32_t)&spim->TASKS_STOP;
 
-	dev_data->anomaly_58_workaround_active = true;
+	dev_data->additional_byte_workaround_active = true;
 
 	/* Create an event when SCK toggles */
 	nrf_gpiote_event_configure(gpiote.p_reg, gpiote_ch, spim->PSEL.SCK,
@@ -346,28 +345,28 @@ static void anomaly_58_workaround_setup(const struct device *dev)
 	 */
 }
 
-static void anomaly_58_workaround_clear(struct spi_nrfx_data *dev_data)
+static void additional_byte_workaround_clear(struct spi_nrfx_data *dev_data)
 {
 	uint32_t ppi_ch = dev_data->ppi_ch;
 	uint32_t gpiote_ch = dev_data->gpiote_ch;
 
-	if (dev_data->anomaly_58_workaround_active) {
+	if (dev_data->additional_byte_workaround_active) {
 		nrf_ppi_channel_disable(NRF_PPI, ppi_ch);
 		nrf_gpiote_task_disable(gpiote.p_reg, gpiote_ch);
 
-		dev_data->anomaly_58_workaround_active = false;
+		dev_data->additional_byte_workaround_active = false;
 	}
 }
 
-static int anomaly_58_workaround_init(const struct device *dev)
+static int additional_byte_workaround_init(const struct device *dev)
 {
 	struct spi_nrfx_data *dev_data = dev->data;
 	const struct spi_nrfx_config *dev_config = dev->config;
 	nrfx_err_t err_code;
 
-	dev_data->anomaly_58_workaround_active = false;
+	dev_data->additional_byte_workaround_active = false;
 
-	if (dev_config->anomaly_58_workaround) {
+	if (dev_config->additional_byte_workaround) {
 		err_code = nrfx_ppi_channel_alloc(&dev_data->ppi_ch);
 		if (err_code != NRFX_SUCCESS) {
 			LOG_ERR("Failed to allocate PPI channel");
@@ -454,10 +453,10 @@ static void transfer_next_chunk(const struct device *dev)
 		xfer.p_rx_buffer = rx_buf;
 		xfer.rx_length   = spi_context_rx_buf_on(ctx) ? chunk_len : 0;
 
-#ifdef CONFIG_SOC_NRF52832_ALLOW_SPIM_DESPITE_PAN_58
+#ifdef CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE
 		if (xfer.rx_length == 1 && xfer.tx_length <= 1) {
-			if (dev_config->anomaly_58_workaround) {
-				anomaly_58_workaround_setup(dev);
+			if (dev_config->additional_byte_workaround) {
+				additional_byte_workaround_setup(dev);
 			} else {
 				LOG_WRN("Transaction aborted since it would trigger "
 					"nRF52832 PAN 58");
@@ -471,8 +470,8 @@ static void transfer_next_chunk(const struct device *dev)
 				return;
 			}
 			error = -EIO;
-#ifdef CONFIG_SOC_NRF52832_ALLOW_SPIM_DESPITE_PAN_58
-			anomaly_58_workaround_clear(dev_data);
+#ifdef CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE
+			additional_byte_workaround_clear(dev_data);
 #endif
 		}
 	}
@@ -497,8 +496,8 @@ static void event_handler(const nrfx_spim_evt_t *p_event, void *p_context)
 			return;
 		}
 
-#ifdef CONFIG_SOC_NRF52832_ALLOW_SPIM_DESPITE_PAN_58
-		anomaly_58_workaround_clear(dev_data);
+#ifdef CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE
+		additional_byte_workaround_clear(dev_data);
 #endif
 #ifdef SPI_BUFFER_IN_RAM
 		if (spi_context_rx_buf_on(&dev_data->ctx) &&
@@ -588,8 +587,8 @@ static int transceive(const struct device *dev,
 
 			/* Clean up the driver state. */
 			k_sem_reset(&dev_data->ctx.sync);
-#ifdef CONFIG_SOC_NRF52832_ALLOW_SPIM_DESPITE_PAN_58
-			anomaly_58_workaround_clear(dev_data);
+#ifdef CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE
+			additional_byte_workaround_clear(dev_data);
 #endif
 		} else if (error) {
 			finalize_spi_transaction(dev, true);
@@ -735,8 +734,8 @@ static int spi_nrfx_init(const struct device *dev)
 
 	spi_context_unlock_unconditionally(&dev_data->ctx);
 
-#ifdef CONFIG_SOC_NRF52832_ALLOW_SPIM_DESPITE_PAN_58
-	err = anomaly_58_workaround_init(dev);
+#ifdef CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE
+	err = additional_byte_workaround_init(dev);
 	if (err < 0) {
 		return err;
 	}
@@ -825,9 +824,9 @@ static int spi_nrfx_init(const struct device *dev)
 		.irq_connect = irq_connect##idx,			       \
 		.pcfg = PINCTRL_DT_DEV_CONFIG_GET(SPIM(idx)),		       \
 		.max_chunk_len = BIT_MASK(SPIM_PROP(idx, easydma_maxcnt_bits)),\
-		COND_CODE_1(CONFIG_SOC_NRF52832_ALLOW_SPIM_DESPITE_PAN_58,     \
-			(.anomaly_58_workaround =			       \
-				SPIM_PROP(idx, anomaly_58_workaround),),       \
+		COND_CODE_1(CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE,    \
+			(.additional_byte_workaround =			       \
+				SPIM_PROP(idx, additional_byte_workaround),),       \
 			())						       \
 		.wake_pin = NRF_DT_GPIOS_TO_PSEL_OR(SPIM(idx), wake_gpios,     \
 						    WAKE_PIN_NOT_USED),	       \
