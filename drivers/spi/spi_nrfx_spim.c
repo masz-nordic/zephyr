@@ -19,7 +19,7 @@
 #ifdef CONFIG_SPI_NRFX_ALLOW_DESPITE_ADDITIONAL_BYTE
 #include <nrfx_ppi.h>
 #endif
-#ifdef CONFIG_SOC_NRF5340_CPUAPP
+#ifdef CONFIG_SPI_NRFX_32MHZ_NEEDS_HFCLK_DIV_1
 #include <hal/nrf_clock.h>
 #endif
 #include <nrfx_spim.h>
@@ -258,10 +258,9 @@ static int configure(const struct device *dev,
 		return -EINVAL;
 	}
 
-#if defined(CONFIG_SOC_NRF5340_CPUAPP)
-	/* On nRF5340, the 32 Mbps speed is supported by the application core
-	 * when it is running at 128 MHz (see the Timing specifications section
-	 * in the nRF5340 PS).
+#if defined(CONFIG_SPI_NRFX_32MHZ_NEEDS_HFCLK_DIV_1)
+	/* On certain SoCs, the 32 Mbps speed is supported by the application core
+	 * when it is running at 128 MHz (i.e. HFCLK divider is 1).
 	 */
 	if (max_freq > 16000000 &&
 	    nrf_clock_hfclk_div_get(NRF_CLOCK) != NRF_CLOCK_HFCLK_DIV_1) {

@@ -113,4 +113,7 @@ config SPI_NRFX_WAKE_TIMEOUT_US
 	  by instances that have the WAKE line configured (see the wake-gpios
 	  devicetree property).
 
+config SPI_NRFX_32MHZ_NEEDS_HFCLK_DIV_1
+	bool
+
 endif # SPI_NRFX
