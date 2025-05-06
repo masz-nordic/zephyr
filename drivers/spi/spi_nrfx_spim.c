@@ -42,14 +42,13 @@ LOG_MODULE_REGISTER(spi_nrfx_spim, CONFIG_SPI_LOG_LEVEL);
 #define SPI_BUFFER_IN_RAM 1
 #endif
 
-#if defined(CONFIG_CLOCK_CONTROL_NRF2_GLOBAL_HSFLL) && \
-	(defined(CONFIG_HAS_HW_NRF_SPIM120) || \
-	 defined(CONFIG_HAS_HW_NRF_SPIM121))
-#define SPIM_REQUESTS_CLOCK(idx) UTIL_OR(IS_EQ(idx, 120), \
-					 IS_EQ(idx, 121))
-#define USE_CLOCK_REQUESTS 1
+#if defined(CONFIG_CLOCK_CONTROL_NRF2_GLOBAL_HSFLL)
+#define SPIM_REQUESTS_CLOCK(idx) DT_NODE_HAS_COMPAT(DT_NODELABEL(DT_CLOCKS_CTLR(idx)), nordic_nrf_hsfll_global) ||
+#define ANY_SPIM_REQUESTS_CLOCK (DT_FOREACH_STATUS_OKAY(nordic_nrf_spim, SPIM_REQUESTS_CLOCK) 0)
+#define USE_CLOCK_REQUESTS ANY_SPIM_REQUESTS_CLOCK
 #else
 #define SPIM_REQUESTS_CLOCK(idx) 0
+#define USE_CLOCK_REQUESTS 0
 #endif
 
 struct spi_nrfx_data {
@@ -67,7 +66,7 @@ struct spi_nrfx_data {
 	uint8_t ppi_ch;
 	uint8_t gpiote_ch;
 #endif
-#ifdef USE_CLOCK_REQUESTS
+#if USE_CLOCK_REQUESTS
 	bool clock_requested;
 #endif
 };
@@ -87,7 +86,7 @@ struct spi_nrfx_config {
 #ifdef CONFIG_DCACHE
 	uint32_t mem_attr;
 #endif
-#ifdef USE_CLOCK_REQUESTS
+#if USE_CLOCK_REQUESTS
 	const struct device *clk_dev;
 	struct nrf_clock_spec clk_spec;
 #endif
@@ -97,7 +96,7 @@ static void event_handler(const nrfx_spim_evt_t *p_event, void *p_context);
 
 static inline int request_clock(const struct device *dev)
 {
-#ifdef USE_CLOCK_REQUESTS
+#if USE_CLOCK_REQUESTS
 	struct spi_nrfx_data *dev_data = dev->data;
 	const struct spi_nrfx_config *dev_config = dev->config;
 	int error;
@@ -124,7 +123,7 @@ static inline int request_clock(const struct device *dev)
 
 static inline void release_clock(const struct device *dev)
 {
-#ifdef USE_CLOCK_REQUESTS
+#if USE_CLOCK_REQUESTS
 	struct spi_nrfx_data *dev_data = dev->data;
 	const struct spi_nrfx_config *dev_config = dev->config;
 
