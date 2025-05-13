@@ -23,6 +23,10 @@ manifest:
       url-base: https://github.com/zephyrproject-rtos
     - name: babblesim
       url-base: https://github.com/BabbleSim
+    - name: masz
+      url-base: https://github.com/masz-nordic
+    - name: nrfconnect
+      url-base: https://github.com/nrfconnect
 
   group-filter: [-babblesim, -optional]
 
@@ -194,9 +198,18 @@ manifest:
       path: modules/hal/microchip
       groups:
         - hal
-    - name: hal_nordic
-      revision: 243c6708278364516c6ca1dcccc00c5f721095fa
+    - name: hal_nordic_base
+      revision: nrfx_ag
       path: modules/hal/nordic
+      remote: masz
+      repo-path: hal_nordic
+      groups:
+        - hal
+    - name: hal_nordic_nrfx
+      remote: nrfconnect
+      repo-path: nrfx
+      path: modules/hal/nordic/nrfx
+      revision: nrfx-poc
       groups:
         - hal
     - name: hal_nuvoton
