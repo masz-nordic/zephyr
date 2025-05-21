@@ -212,11 +212,11 @@ manifest:
       revision: nrfx-poc
       groups:
         - hal
-    - name: hal_nordic_bsp_lumos
+    - name: hal_nordic_bsp_fake
       remote: nrfconnect
       repo-path: nrfx
-      path: modules/hal/nordic/nrfx/bsp/lumos
-      revision: nrfx-bsp-lumos
+      path: modules/hal/nordic/nrfx/bsp/fake
+      revision: nrf-bsp-fake
       groups:
         - hal
     - name: hal_nuvoton
