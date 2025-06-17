@@ -89,6 +89,9 @@ config RISCV_ISA_EXT_Q
 
 config RISCV_ISA_EXT_C
 	bool
+	select RISCV_ISA_EXT_ZCA
+	select RISCV_ISA_EXT_ZCF if (RISCV_ISA_EXT_F && (RISCV_ISA_RV32E || RISCV_ISA_RV32I))
+	select RISCV_ISA_EXT_ZCD if RISCV_ISA_EXT_D
 	help
 	  (C) - Standard Extension for Compressed Instructions
 
@@ -162,6 +165,57 @@ config RISCV_ISA_EXT_ZBS
 	  The Zbs instructions can be used for single-bit instructions that
 	  provide a mechanism to set, clear, invert, or extract a single bit in
 	  a register.
+
+config RISCV_ISA_EXT_ZCA
+	bool
+	help
+	  (Zca) - Subset of C extension that does not include the floating-point loads and stores
+
+config RISCV_ISA_EXT_ZCB
+	bool
+	depends on RISCV_ISA_EXT_ZCA
+	help
+	  (Zcb) - Simple code-size saving instructions which are easy to implement on all CPUs.
+
+config RISCV_ISA_EXT_ZCD
+	bool
+	depends on RISCV_ISA_EXT_ZCA
+	depends on RISCV_ISA_EXT_D
+	help
+	  (Zcd) - Compressed double precision floating point loads and stores.
+
+config RISCV_ISA_EXT_ZCE
+	bool
+	select RISCV_ISA_EXT_ZCA
+	select RISCV_ISA_EXT_ZCB
+	select RISCV_ISA_EXT_ZCMP
+	select RISCV_ISA_EXT_ZCMT
+	select RISCV_ISA_EXT_ZCF if (RISCV_ISA_EXT_F && (RISCV_ISA_RV32E || RISCV_ISA_RV32I))
+	help
+	  (Zde) - All relevant Zc extensions for microcontrollers.
+
+config RISCV_ISA_EXT_ZCF
+	bool
+	depends on RISCV_ISA_EXT_ZCA
+	depends on RISCV_ISA_EXT_F
+	depends on (RISCV_ISA_RV32E || RISCV_ISA_RV32I)
+	help
+	  (Zcf) - Compressed single precision floating point loads and stores.
+
+config RISCV_ISA_EXT_ZCMP
+	bool
+	depends on !RISCV_ISA_EXT_ZCD
+	depends on RISCV_ISA_EXT_ZCA
+	help
+	  (Zcmp) - Instructions which may be executed as a series of existing 32-bit RISC-V instructions.
+
+config RISCV_ISA_EXT_ZCMT
+	bool
+	depends on !RISCV_ISA_EXT_ZCD
+	depends on RISCV_ISA_EXT_ZCA
+	depends on RISCV_ISA_EXT_ZICSR
+	help
+	  (Zcmt) - Table jump instructions and JVT CSR.
 
 config RISCV_ISA_EXT_ZMMUL
 	bool
