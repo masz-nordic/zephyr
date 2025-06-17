@@ -22,9 +22,26 @@ endif()
 
 if (CONFIG_RISCV_ISA_EXT_M)
     string(CONCAT riscv_march ${riscv_march} "m")
+else()
+    # Zmull is implied by M
+    if(CONFIG_RISCV_ISA_EXT_ZMMUL AND
+       "${GCC_COMPILER_VERSION}" VERSION_GREATER_EQUAL 13.0.0)
+        string(CONCAT riscv_march ${riscv_march} "_zmmul")
+    endif()
 endif()
+
 if (CONFIG_RISCV_ISA_EXT_A)
     string(CONCAT riscv_march ${riscv_march} "a")
+else()
+    # Zaamo is implied by A
+    if(CONFIG_RISCV_ISA_EXT_ZAAMO)
+      string(CONCAT riscv_march ${riscv_march} "_zaamo")
+    endif()
+
+    # Zlrsc is implied by A
+    if(CONFIG_RISCV_ISA_EXT_ZLRSC)
+      string(CONCAT riscv_march ${riscv_march} "_zlrsc")
+    endif()
 endif()
 
 if(CONFIG_FPU)
@@ -53,18 +70,6 @@ if(CONFIG_RISCV_ISA_EXT_ZIFENCEI)
     string(CONCAT riscv_march ${riscv_march} "_zifencei")
 endif()
 
-# Check whether we already imply Zaamo/Zlrsc by selecting the A extension; if not - check them
-# individually and enable them as needed
-if(NOT CONFIG_RISCV_ISA_EXT_A)
-  if(CONFIG_RISCV_ISA_EXT_ZAAMO)
-    string(CONCAT riscv_march ${riscv_march} "_zaamo")
-  endif()
-
-  if(CONFIG_RISCV_ISA_EXT_ZLRSC)
-    string(CONCAT riscv_march ${riscv_march} "_zlrsc")
-  endif()
-endif()
-
 if(CONFIG_RISCV_ISA_EXT_ZBA)
     string(CONCAT riscv_march ${riscv_march} "_zba")
 endif()
@@ -81,12 +86,6 @@ if(CONFIG_RISCV_ISA_EXT_ZBS)
     string(CONCAT riscv_march ${riscv_march} "_zbs")
 endif()
 
-# Check whether we already imply Zmmul by selecting the M extension; if not - enable it
-if(NOT CONFIG_RISCV_ISA_EXT_M AND
-   CONFIG_RISCV_ISA_EXT_ZMMUL AND
-   "${GCC_COMPILER_VERSION}" VERSION_GREATER_EQUAL 13.0.0)
-    string(CONCAT riscv_march ${riscv_march} "_zmmul")
-endif()
 
 list(APPEND TOOLCHAIN_C_FLAGS -mabi=${riscv_mabi} -march=${riscv_march})
 list(APPEND TOOLCHAIN_LD_FLAGS NO_SPLIT -mabi=${riscv_mabi} -march=${riscv_march})
