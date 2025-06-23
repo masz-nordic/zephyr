@@ -1,0 +1,8 @@
+tests:
+  arch.riscv.compressed:
+    arch_allow: riscv
+    filter: >
+      CONFIG_RISCV_ISA_EXT_ZCA or CONFIG_RISCV_ISA_EXT_ZCB or
+      CONFIG_RISCV_ISA_EXT_ZCD or CONFIG_RISCV_ISA_EXT_ZCF or
+      CONFIG_RISCV_ISA_EXT_ZCMP or CONFIG_RISCV_ISA_EXT_ZCMT
+
