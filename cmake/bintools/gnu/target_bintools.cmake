@@ -62,7 +62,7 @@ set_property(TARGET bintools PROPERTY elfconvert_flag_outfile "")
 # - disassembly : Name of command for disassembly of files
 #                 In this implementation `objdump` is used
 #   disassembly_flag               : -d
-#   disassembly_flag_final         : empty
+#   disassembly_flag_final         : empty or -M no-aliases
 #   disassembly_flag_inline_source : -S
 #   disassembly_flag_all           : -SDz
 #   disassembly_flag_infile        : empty, objdump doesn't take arguments for filenames
@@ -70,7 +70,11 @@ set_property(TARGET bintools PROPERTY elfconvert_flag_outfile "")
 
 set_property(TARGET bintools PROPERTY disassembly_command ${CMAKE_OBJDUMP})
 set_property(TARGET bintools PROPERTY disassembly_flag -d)
+if(CONFIG_OUTPUT_DISASSEMBLY_NO_ALIASES)
+set_property(TARGET bintools PROPERTY disassembly_flag_final "-M no-aliases")
+else()
 set_property(TARGET bintools PROPERTY disassembly_flag_final "")
+endif()
 set_property(TARGET bintools PROPERTY disassembly_flag_inline_source -S)
 set_property(TARGET bintools PROPERTY disassembly_flag_all -SDz)
 
