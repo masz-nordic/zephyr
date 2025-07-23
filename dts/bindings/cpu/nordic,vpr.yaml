@@ -16,3 +16,8 @@ properties:
     required: true
     description:
       Bus width of the CPU.
+
+  nordic,deep-sleep-retain:
+    type: boolean
+    description:
+      Registers retained in deep sleep mode.
