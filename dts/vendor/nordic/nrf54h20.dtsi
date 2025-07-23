@@ -53,6 +53,7 @@
 			clock-frequency = <DT_FREQ_M(16)>;
 			riscv,isa = "rv32emc";
 			nordic,bus-width = <32>;
+			nordic,deep-sleep-retain;
 
 			cpuppr_vevif_rx: mailbox {
 				compatible = "nordic,nrf-vevif-task-rx";
