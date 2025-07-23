@@ -13,6 +13,10 @@ static int vpr_init(void)
 	 */
 	nrf_vpr_csr_rtperiph_enable_set(true);
 
+#if CONFIG_RISCV_CORE_NORDIC_VPR_DEEP_SLEEP
+	nrf_vpr_csr_sleep_state_set(NRF_VPR_CSR_SLEEP_STATE_DEEP_SLEEP);
+#endif
+
 	return 0;
 }
 

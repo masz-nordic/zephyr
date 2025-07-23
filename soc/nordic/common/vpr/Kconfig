@@ -21,3 +21,15 @@ config RISCV_CORE_NORDIC_VPR
 	imply XIP
 	help
 	  Enable support for the RISC-V Nordic VPR core.
+
+if RISCV_CORE_NORDIC_VPR
+
+DEEP_SLEEP_PROP := nordic,deep-sleep-retain
+
+config RISCV_CORE_NORDIC_VPR_DEEP_SLEEP
+	bool "Enable deep sleep"
+	depends on $(dt_nodelabel_bool_prop,cpu,$(DEEP_SLEEP_PROP))
+	help
+	  Enter deep sleep mode instead of sleep mode.
+
+endif
