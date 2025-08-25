@@ -26,7 +26,17 @@ wdt011: &cpurad_wdt011 {};
 		interrupt-parent = <&cpurad_nvic>;
 		ranges;
 	};
+
+	resources {
+		test_wdt: test_wdt {
+			compatible = "vnd,wdt";
+			status = "okay";
+		};
+	};
 };
+
+#define WDT_ENABLE
+wdt_enable: &wdt011{};
 
 &cpurad_ppb {
 	compatible = "simple-bus";

@@ -26,7 +26,17 @@ wdt011: &cpuapp_wdt011 {};
 		interrupt-parent = <&cpuapp_nvic>;
 		ranges;
 	};
+
+	resources {
+		test_wdt: test_wdt {
+			compatible = "vnd,wdt";
+			status = "okay";
+		};
+	};
 };
+
+#define WDT_ENABLE
+wdt_enable: &wdt010{};
 
 &cpuapp_ppb {
 	compatible = "simple-bus";

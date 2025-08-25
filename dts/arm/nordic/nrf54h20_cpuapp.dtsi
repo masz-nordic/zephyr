@@ -33,7 +33,17 @@ wdt011: &cpuapp_wdt011 {};
 			reg = <0xa2000000 0x1000000>;
 		};
 	};
+
+	resources {
+		test_wdt: test_wdt {
+			compatible = "vnd,wdt";
+			status = "okay";
+		};
+	};
 };
+
+#define WDT_ENABLE
+wdt_enable: &wdt010{};
 
 &cpuapp_ppb {
 	compatible = "simple-bus";

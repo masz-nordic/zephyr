@@ -112,6 +112,13 @@
 	ipc {
 		#include "nrf5340_cpuapp_ipc.dtsi"
 	};
+
+	resources {
+		test_wdt: test_wdt {
+			compatible = "vnd,wdt";
+			status = "okay";
+		};
+	};
 };
 
 &rng_hci {
