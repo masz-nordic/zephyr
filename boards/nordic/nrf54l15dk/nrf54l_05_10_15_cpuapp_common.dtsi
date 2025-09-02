@@ -138,6 +138,9 @@
 	};
 };
 
+#define SPI_NODE_DELETE
+spi_delete: &mx25r64{};
+
 &adc {
 	status = "okay";
 };

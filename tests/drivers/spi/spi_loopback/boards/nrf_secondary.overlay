@@ -1,0 +1,69 @@
+/*
+ * Copyright (c) 2024 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#ifdef SPI_SECONDARY_ENABLE
+&pinctrl {
+	spi_secondary_node_default: spi_secondary_node_default {
+		group1 {
+			psels = <NRF_PSEL(SPIM_MISO, SPI_SECONDARY_PORT, SPI_SECONDARY_MISO)>;
+		};
+		group2 {
+			psels = <NRF_PSEL(SPIM_SCK, SPI_SECONDARY_PORT, SPI_SECONDARY_SCK)>,
+				<NRF_PSEL(SPIM_MOSI, SPI_SECONDARY_PORT, SPI_SECONDARY_MOSI)>;
+		};
+	};
+
+	spi_secondary_node_sleep: spi_secondary_node_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, SPI_SECONDARY_PORT, SPI_SECONDARY_SCK)>,
+				<NRF_PSEL(SPIM_MISO, SPI_SECONDARY_PORT, SPI_SECONDARY_MISO)>,
+				<NRF_PSEL(SPIM_MOSI, SPI_SECONDARY_PORT, SPI_SECONDARY_MOSI)>;
+			low-power-enable;
+		};
+	};
+};
+
+/delete-node/ &dut_fast;
+
+&spi_secondary_enable {
+	status = "okay";
+	pinctrl-0 = <&spi_secondary_node_default>;
+	pinctrl-1 = <&spi_secondary_node_sleep>;
+	pinctrl-names = "default", "sleep";
+	overrun-character = <0x00>;
+	zephyr,pm-device-runtime-auto;
+	slow@0 {
+		compatible = "test-spi-loopback-slow";
+		reg = <0>;
+		spi-max-frequency = <SPI_SECONDARY_FREQ_SLOW>;
+	};
+	dut_fast: fast@0 {
+		compatible = "test-spi-loopback-fast";
+		reg = <0>;
+		spi-max-frequency = <SPI_SECONDARY_FREQ_FAST>;
+	};
+	cs-gpios = <&spi_secondary_cs_gpio SPI_SECONDARY_CS 0>;
+};
+#endif
+
+&spi_secondary_cs_gpio {
+	status = "okay";
+	zephyr,pm-device-runtime-auto;
+};
+
+&spi_secondary_gpio_enable {
+	status = "okay";
+};
+
+&spi_secondary_gpiote_enable {
+	status = "okay";
+};
+
+#ifdef SPI_SECONDARY_MEM_REG
+&spi_secondary_enable {
+	memory-regions = <&spi_secondary_mem_reg>;
+};
+#endif

@@ -39,11 +39,62 @@ wdt011: &cpuapp_wdt011 {};
 			compatible = "vnd,wdt";
 			status = "okay";
 		};
+
+		test_spi_secondary: test_spi_secondary {
+			compatible = "vnd,test-spi-secondary";
+			status = "okay";
+		};
+
+		test_spi_failing: test_spi_failing {
+			compatible = "vnd,test-spi-failing";
+			status = "okay";
+		};
+
+		test_spi_tertiary: test_spi_tertiary {
+			compatible = "vnd,test-spi-tertiary";
+			status = "okay";
+		};
 	};
 };
 
+/* vnd,wdt */
 #define WDT_ENABLE
 wdt_enable: &wdt010{};
+
+/* vnd,test-spi */
+#define SPI_ENABLE
+spi_enable: &spi120{};
+#define SPI_PORT 7
+#define SPI_MISO 6
+#define SPI_SCK  3
+#define SPI_MOSI 7
+#define SPI_FREQ_SLOW DT_FREQ_M(4)
+#define SPI_FREQ_FAST DT_FREQ_M(8)
+#define SPI_DRIVE_MODE NRF_DRIVE_E0E1
+#define SPI_MEM_REG
+
+/* vnd,test-spi-secondary */
+#define SPI_SECONDARY_MEM_REG
+
+/* vnd,test-spi-failing */
+#define SPI_FREQ_FAILING DT_FREQ_M(2)
+
+/* vnd,test-spi-tertiary */
+#define SPI_TERTIARY_ENABLE
+spi_tertiary_enable: &spi121{};
+#define SPI_TERTIARY_PORT 2
+#define SPI_TERTIARY_MISO 10
+#define SPI_TERTIARY_SCK  2
+#define SPI_TERTIARY_MOSI 11
+#define SPI_TERTIARY_FREQ_SLOW DT_FREQ_M(4)
+#define SPI_TERTIARY_FREQ_FAST DT_FREQ_M(8)
+#define SPI_TERTIARY_DRIVE_MODE NRF_DRIVE_E0E1
+#define SPI_TERTIARY_MEM_REG
+#define SPI_TERTIARY_NFC_DISABLE
+#define SPI_TERTIARY_GPIO_ENABLE
+spi_tertiary_gpio_enable: &gpio2{};
+
+//TODO: move CONFIG_SPI_IDEAL_TRANSFER_DURATION_SCALING to DT
 
 &cpuapp_ppb {
 	compatible = "simple-bus";

@@ -10,5 +10,5 @@
  */
 
 &dut_fast {
-	spi-max-frequency = <DT_FREQ_M(1)>;
+	spi-max-frequency = <SPI_FREQ_FAILING>;
 };

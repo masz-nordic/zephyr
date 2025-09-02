@@ -776,8 +776,36 @@
 			compatible = "vnd,wdt";
 			status = "okay";
 		};
+
+		test_spi: test_spi {
+			compatible = "vnd,test-spi";
+			status = "okay";
+		};
+
+		test_spi_failing: test_spi_failing {
+			compatible = "vnd,test-spi-failing";
+			status = "okay";
+		};
 	};
 };
 
+/* vnd,wdt */
 #define WDT_ENABLE
 wdt_enable: &wdt31{};
+
+/* vnd,test-spi */
+#define SPI_ENABLE
+spi_enable: &spi00{};
+#define SPI_PORT 2
+#define SPI_MISO 9
+#define SPI_SCK  6
+#define SPI_MOSI 8
+#define SPI_FREQ_SLOW DT_FREQ_M(2)
+#define SPI_FREQ_FAST DT_FREQ_M(4)
+#define SPI_DRIVE_MODE NRF_DRIVE_E0E1
+
+#define SPI_GPIO_ENABLE
+spi_gpio_enable: &gpio2 {};
+
+/* vnd,test-spi-failing */
+#define SPI_FREQ_FAILING DT_FREQ_M(1)

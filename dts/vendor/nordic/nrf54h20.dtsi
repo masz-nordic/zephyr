@@ -1696,3 +1696,17 @@
 		status = "disabled";
 	};
 };
+
+/* vnd,test-spi-secondary */
+#define SPI_SECONDARY_ENABLE
+spi_secondary_enable: &spi130{};
+#define SPI_SECONDARY_PORT 0
+#define SPI_SECONDARY_MISO 6
+#define SPI_SECONDARY_SCK  0
+#define SPI_SECONDARY_MOSI 7
+#define SPI_SECONDARY_FREQ_SLOW DT_FREQ_K(500)
+#define SPI_SECONDARY_FREQ_FAST DT_FREQ_M(8)
+spi_secondary_cs_gpio: &gpio7{};
+#define SPI_SECONDARY_CS 0
+spi_secondary_gpio_enable: &gpio0{};
+spi_secondary_gpiote_enable: &gpiote130{};

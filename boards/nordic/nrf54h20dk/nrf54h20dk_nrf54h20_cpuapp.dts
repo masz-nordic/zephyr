@@ -177,6 +177,10 @@ ipc0: &cpuapp_cpurad_ipc {
 	status = "okay";
 };
 
+spi_mem_reg: &dma_fast_region{};
+spi_secondary_mem_reg: &cpuapp_dma_region{};
+spi_tertiary_mem_reg: &dma_fast_region{};
+
 ironside_se_boot_report: &cpuapp_ironside_se_boot_report {};
 
 boot_partition: &cpuapp_boot_partition {

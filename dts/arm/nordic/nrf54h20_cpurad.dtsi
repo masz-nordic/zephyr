@@ -39,11 +39,21 @@ wdt011: &cpurad_wdt011 {};
 			compatible = "vnd,wdt";
 			status = "okay";
 		};
+
+		test_spi_secondary: test_spi_secondary {
+			compatible = "vnd,test-spi-secondary";
+			status = "okay";
+		};
 	};
 };
 
+/* vnd,test-wdt */
 #define WDT_ENABLE
 wdt_enable: &wdt011{};
+
+/* vnd,test-spi-secondary */
+#define SPI_SECONDARY_MEM_REG
+spi_secondary_mem_reg: &cpurad_dma_region{};
 
 &cpurad_ppb {
 	compatible = "simple-bus";

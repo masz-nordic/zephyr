@@ -877,8 +877,45 @@
 			compatible = "vnd,wdt";
 			status = "okay";
 		};
+
+		test_spi: test_spi {
+			compatible = "vnd,test-spi";
+			status = "okay";
+		};
+
+		test_spi_tertiarty: test_spi_tertiarty {
+			compatible = "vnd,test-spi-tertiarty";
+			status = "okay";
+		};
 	};
 };
 
 #define WDT_ENABLE
 wdt_enable: &wdt31{};
+
+/* vnd,test-spi */
+#define SPI_ENABLE
+spi_enable: &spi21{};
+#define SPI_PORT 1
+#define SPI_MISO 13
+#define SPI_SCK  24
+#define SPI_MOSI 14
+#define SPI_FREQ_SLOW DT_FREQ_M(2)
+#define SPI_FREQ_FAST DT_FREQ_M(4)
+#define SPI_DRIVE_MODE NRF_DRIVE_E0E1
+
+#define SPI_GPIO_ENABLE
+spi_gpio_enable: &gpio1 {};
+
+/* vnd,test-spi-tertiarty */
+#define SPI_TERTIARY_ENABLE
+spi_tertiarty_enable: &spi00{};
+#define SPI_TERTIARY_PORT 2
+#define SPI_TERTIARY_MISO 4
+#define SPI_TERTIARY_SCK  1
+#define SPI_TERTIARY_MOSI 2
+#define SPI_TERTIARY_FREQ_SLOW DT_FREQ_M(16)
+#define SPI_TERTIARY_FREQ_FAST DT_FREQ_M(32)
+#define SPI_TERTIARY_DRIVE_MODE NRF_DRIVE_E0E1
+#define SPI_TERTIARY_GPIO_ENABLE
+spi_tertiary_gpio_enable: &gpio2{};

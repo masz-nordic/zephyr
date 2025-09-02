@@ -217,74 +217,32 @@ tests:
       - mimxrt1064_evk
       - mimxrt1060_evk/mimxrt1062/qspi
       - mimxrt1040_evk
-  drivers.spi.nrf54h_fast_2mhz:
-    extra_args:
-      - DTC_OVERLAY_FILE="boards/nrf54h20dk_nrf54h20_cpuapp_fast.overlay"
-      - EXTRA_DTC_OVERLAY_FILE="boards/nrf_at_2mhz.overlay"
-    platform_allow:
-      - nrf54h20dk/nrf54h20/cpuapp
-    harness: console
-    harness_config:
-      fixture: spi_loopback
-      type: one_line
-      regex:
-        - "Failed to initialize nrfx driver"
-  drivers.spi.nrf54h_fast_8mhz:
-    extra_args: DTC_OVERLAY_FILE="boards/nrf54h20dk_nrf54h20_cpuapp_fast.overlay"
-    platform_allow:
-      - nrf54h20dk/nrf54h20/cpuapp
-  drivers.spi.nrf54h_fast_16mhz:
-    extra_args:
-      - DTC_OVERLAY_FILE="boards/nrf54h20dk_nrf54h20_cpuapp_fast.overlay"
-      - EXTRA_DTC_OVERLAY_FILE="boards/nrf_at_16mhz.overlay"
-    platform_allow:
-      - nrf54h20dk/nrf54h20/cpuapp
-  drivers.spi.nrf54h_fast_32mhz:
-    extra_args:
-      - DTC_OVERLAY_FILE="boards/nrf54h20dk_nrf54h20_cpuapp_fast.overlay"
-      - EXTRA_DTC_OVERLAY_FILE="boards/nrf_at_32mhz.overlay"
-    platform_allow:
-      - nrf54h20dk/nrf54h20/cpuapp
-  drivers.spi.nrf54h_fast_8mhz_port2:
-    extra_args:
-      - DTC_OVERLAY_FILE="boards/nrf54h20dk_nrf54h20_cpuapp_fast_p2.overlay"
-      - CONFIG_NRF_REGTOOL_VERBOSITY=2
-    platform_allow:
-      - nrf54h20dk/nrf54h20/cpuapp
-  drivers.spi.nrf54l_1mhz:
-    extra_args: EXTRA_DTC_OVERLAY_FILE="boards/nrf_at_1mhz.overlay"
-    platform_allow:
-      - nrf54l15dk/nrf54l15/cpuapp
-    harness: console
-    harness_config:
-      fixture: spi_loopback
-      type: one_line
-      regex:
-        - "Failed to initialize nrfx driver"
-  drivers.spi.nrf54l_8mhz:
+  drivers.spi.nrf.generic:
+    filter: dt_compat_enabled("vnd,test-spi")
+  drivers.spi.nrf.8mhz:
     extra_args: EXTRA_DTC_OVERLAY_FILE="boards/nrf_at_8mhz.overlay"
-    platform_allow:
-      - nrf54l15dk/nrf54l15/cpuapp
-      - nrf54lm20dk/nrf54lm20a/cpuapp
-      - ophelia4ev/nrf54l15/cpuapp
-  drivers.spi.nrf54l_16mhz:
+    filter: dt_compat_enabled("vnd,test-spi")
+  drivers.spi.nrf.16mhz:
     extra_args: EXTRA_DTC_OVERLAY_FILE="boards/nrf_at_16mhz.overlay"
-    platform_allow:
-      - nrf54l15dk/nrf54l15/cpuapp
-      - ophelia4ev/nrf54l15/cpuapp
-  drivers.spi.nrf54l_32mhz:
+    filter: dt_compat_enabled("vnd,test-spi")
+  drivers.spi.nrf.32mhz:
     extra_args: EXTRA_DTC_OVERLAY_FILE="boards/nrf_at_32mhz.overlay"
-    platform_allow:
-      - nrf54l15dk/nrf54l15/cpuapp
-      - ophelia4ev/nrf54l15/cpuapp
-  drivers.spi.nrf54lm20_16mhz_32mhz:
-    harness: ztest
+    filter: dt_compat_enabled("vnd,test-spi")
+  drivers.spi.nrf.secondary:
+    extra_args: EXTRA_DTC_OVERLAY_FILE="boards/nrf_secondary.overlay"
+    filter: dt_compat_enabled("vnd,test-spi-secondary")
+  drivers.spi.nrf.tertiary:
+    extra_args: EXTRA_DTC_OVERLAY_FILE="boards/nrf_tertiary.overlay"
+    filter: dt_compat_enabled("vnd,test-spi-tertiary")
+  drivers.spi.nrf.failing:
+    extra_args: EXTRA_DTC_OVERLAY_FILE="boards/nrf_failing.overlay"
+    filter: dt_compat_enabled("vnd,test-spi-failing")
+    harness: console
     harness_config:
-      fixture: spi_fast_loopback
-    extra_args:
-      - DTC_OVERLAY_FILE="boards/nrf54lm20dk_nrf54lm20a_cpuapp_spi00.overlay"
-    platform_allow:
-      - nrf54lm20dk/nrf54lm20a/cpuapp
+      fixture: spi_loopback
+      type: one_line
+      regex:
+        - "Failed to initialize nrfx driver"
   drivers.spi.ke1xz_flexio_spi.loopback:
     extra_args: DTC_OVERLAY_FILE="boards/frdm_ke1xz_flexio_spi.overlay"
     filter: CONFIG_DT_HAS_NXP_FLEXIO_ENABLED and
